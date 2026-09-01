@@ -6,7 +6,8 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 
 1. Copiá `env.example` como `.env.local`.
 2. Configurá `VITE_API_BASE_URL` con el origen del backend; esta variable no debe contener secretos.
-3. Ejecutá `pnpm install --frozen-lockfile` y `pnpm dev`.
+3. Activá el pnpm fijado por el proyecto con `corepack enable`.
+4. Ejecutá `pnpm install --frozen-lockfile` y `pnpm dev`.
 
 ## Calidad
 
