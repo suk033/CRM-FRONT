@@ -1,0 +1,6 @@
+allowBuilds:
+  esbuild: true
+  msw: true
+
+overrides:
+  "@testing-library/jest-dom": 6.9.1
