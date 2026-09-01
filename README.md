@@ -15,3 +15,7 @@ Authentication, current-user lookup, company/contact workflows, and business err
 Run `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run openapi:check`.
 
 The OpenAPI snapshot lives at `src/api/openapi.json`; its generated TypeScript schema is `src/api/schema.ts`. After replacing the snapshot, run `npm run openapi:generate` and then `npm run openapi:check` to confirm no drift.
+
+## Container
+
+Build with `docker build -t supra-crm-front .` and run with `docker run --rm -p 8080:80 supra-crm-front`. Nginx serves the Vite build and falls back to `index.html` for SPA routes.
