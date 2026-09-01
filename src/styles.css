@@ -95,6 +95,24 @@ h2 {
   outline: var(--focus-outline);
   outline-offset: var(--space-2xs);
 }
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  padding: var(--space-lg);
+  place-items: center;
+}
+.login-card,
+.app-shell main {
+  max-width: 44rem;
+  width: 100%;
+}
+.app-shell {
+  display: grid;
+  gap: var(--space-lg);
+  min-height: 100vh;
+  padding: var(--space-lg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

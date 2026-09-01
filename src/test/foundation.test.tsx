@@ -3,24 +3,20 @@ import { describe, expect, it } from "vitest";
 import { App } from "../App";
 
 describe("frontend foundation", () => {
-  it("renders an accessible readiness landing", () => {
+  it("renders an accessible sign-in route for unauthenticated visitors", async () => {
     render(<App />);
 
-    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(await screen.findByRole("main")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", {
-        level: 1,
-        name: /la base del crm está lista/i,
-      }),
+      screen.getByRole("heading", { level: 1, name: /iniciar sesión/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        level: 2,
-        name: /preparada para la siguiente fase/i,
-      }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("list")).toHaveTextContent(
-      /contrato openapi tipado/i,
+    expect(screen.getByLabelText(/correo electrónico/i)).toHaveAttribute(
+      "type",
+      "email",
+    );
+    expect(screen.getByLabelText(/contraseña/i)).toHaveAttribute(
+      "type",
+      "password",
     );
   });
 });
