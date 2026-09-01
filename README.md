@@ -1,8 +1,6 @@
 # SUPRA CRM Frontend
 
-Phase 1 provides the executable frontend foundation for SUPRA CRM. It includes a strict React + TypeScript setup, responsive accessible readiness landing, React Router and TanStack Query providers, and a typed OpenAPI client.
-
-Authentication, current-user lookup, company/contact workflows, and business error handling are intentionally deferred to later phases. `Prototipo/` contains design references only and is not part of the executable app.
+Phase 2 adds memory-only JWT authentication: a Spanish login, protected shell, current-user display, Bearer requests, and logout/401 cleanup. Company and contact workflows remain intentionally deferred. `Prototipo/` contains design references only and is not part of the executable app.
 
 ## Start
 
