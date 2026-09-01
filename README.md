@@ -1,19 +1,19 @@
-# SUPRA CRM Frontend
+# Frontend de SUPRA CRM
 
-Phase 2 adds memory-only JWT authentication: a Spanish login, protected shell, current-user display, Bearer requests, and logout/401 cleanup. Company and contact workflows remain intentionally deferred. `Prototipo/` contains design references only and is not part of the executable app.
+La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio de sesión en español, shell protegido, visualización del usuario actual, solicitudes Bearer y limpieza de sesión ante logout o respuestas 401. Los flujos de empresas y contactos quedan intencionalmente pendientes. `Prototipo/` contiene referencias de diseño y no forma parte de la aplicación ejecutable.
 
-## Start
+## Inicio
 
-1. Copy `env.example` to `.env.local`.
-2. Set `VITE_API_BASE_URL` to the backend origin (no secrets).
-3. Run `npm ci` and `npm run dev`.
+1. Copiá `env.example` como `.env.local`.
+2. Configurá `VITE_API_BASE_URL` con el origen del backend; esta variable no debe contener secretos.
+3. Ejecutá `npm ci` y `npm run dev`.
 
-## Quality
+## Calidad
 
-Run `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run openapi:check`.
+Ejecutá `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`, `npm run build` y `npm run openapi:check`.
 
-The OpenAPI snapshot lives at `src/api/openapi.json`; its generated TypeScript schema is `src/api/schema.ts`. After replacing the snapshot, run `npm run openapi:generate` and then `npm run openapi:check` to confirm no drift.
+La instantánea de OpenAPI se encuentra en `src/api/openapi.json` y su esquema TypeScript generado en `src/api/schema.ts`. Después de reemplazar la instantánea, ejecutá `npm run openapi:generate` y luego `npm run openapi:check` para comprobar que no exista deriva del contrato.
 
-## Container
+## Contenedor
 
-Build with `docker build -t supra-crm-front .` and run with `docker run --rm -p 8080:80 supra-crm-front`. Nginx serves the Vite build and falls back to `index.html` for SPA routes.
+Construí la imagen con `docker build -t supra-crm-front .` y ejecutala con `docker run --rm -p 8080:80 supra-crm-front`. Nginx sirve la compilación de Vite y utiliza `index.html` como fallback para las rutas de la SPA.
