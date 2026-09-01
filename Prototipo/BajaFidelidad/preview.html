@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuPra CRM — Prototipo UX Baja Fidelidad</title>
+<style>
+:root{
+  --bg:#f4f4f4;--panel:#fff;--line:#c9c9c9;--line2:#e4e4e4;--ink:#202020;--muted:#666;--dark:#333;--soft:#ededed;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.sidebar{background:#2d2d2d;color:#fff;padding:18px 14px;position:sticky;top:0;height:100vh}
+.brand{font-size:20px;font-weight:800;padding:8px 10px 18px}.brand small{display:block;font-size:11px;font-weight:400;color:#bbb;margin-top:4px}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9f9f9f;padding:14px 10px 7px}
+.nav-btn{width:100%;text-align:left;background:none;border:0;color:#ddd;padding:10px;border-radius:6px;margin:1px 0}
+.nav-btn:hover,.nav-btn.active{background:#494949;color:#fff}
+.main{min-width:0}
+.topbar{height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:5}
+.context h1{font-size:18px;margin:0}.context p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.top-actions{display:flex;gap:8px;align-items:center}.chip,.btn{border:1px solid #aaa;background:#fff;border-radius:6px;padding:9px 12px}.btn.primary{background:#333;color:#fff;border-color:#333}.btn.danger{border-style:dashed}.avatar{width:34px;height:34px;border-radius:50%;background:#555;color:#fff;display:grid;place-items:center;font-weight:700}
+.content{padding:24px;max-width:1500px;margin:auto}.screen{display:none}.screen.active{display:block}
+.grid{display:grid;gap:16px}.cols-4{grid-template-columns:repeat(4,1fr)}.cols-3{grid-template-columns:repeat(3,1fr)}.cols-2{grid-template-columns:repeat(2,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px}.card h3{margin:0 0 12px;font-size:14px}.metric{font-size:28px;font-weight:700}.muted{color:var(--muted)}.tiny{font-size:11px}
+.toolbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}.toolbar .left,.toolbar .right{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{border:1px solid #aaa;border-radius:5px;background:#fff;padding:9px 10px;min-height:36px}textarea{min-height:80px;resize:vertical}
+.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:900px}th,td{padding:12px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top}th{font-size:11px;color:#555;background:#f7f7f7;text-transform:uppercase;letter-spacing:.04em}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid #999;border-radius:999px;padding:4px 8px;background:#fff}.status:before{content:"●";font-size:8px}.status.warn:before{content:"▲"}.status.done:before{content:"✓"}.status.stop:before{content:"×"}
+.meta{display:flex;gap:14px;flex-wrap:wrap;color:#555;font-size:12px;margin:8px 0}.meta b{color:#222}
+.header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}.header-row h2{margin:0 0 6px}.tabs{display:flex;border-bottom:1px solid var(--line);gap:4px;margin-bottom:16px;overflow:auto}.tab{border:0;background:none;padding:10px 12px;white-space:nowrap}.tab.active{border-bottom:3px solid #333;font-weight:700}
+.form-section{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px}.form-section h3{margin-top:0}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:600}.field.full{grid-column:1/-1}
+.split{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.item{border:1px solid var(--line);border-radius:7px;padding:12px;background:#fff}
+.kpi-list{display:grid;gap:10px}.kpi-line{display:grid;grid-template-columns:1fr auto;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line2)}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:12px;overflow:auto;padding-bottom:8px}.lane{background:#e9e9e9;border:1px solid #ccc;border-radius:8px;padding:10px;min-height:420px}.lane h3{font-size:12px;margin:2px 0 10px}.deal{background:#fff;border:1px solid #bbb;border-radius:7px;padding:11px;margin-bottom:9px}.deal strong{display:block;margin-bottom:5px}
+.match-layout{display:grid;grid-template-columns:340px 1fr;gap:16px}.requirement-summary{position:sticky;top:92px;height:max-content}.property-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.prop{background:#fff;border:1px solid #bbb;border-radius:8px;padding:14px}.score{font-size:22px;font-weight:800}.checkline{display:flex;align-items:center;gap:8px;margin-top:10px}
+.timeline{border-left:2px solid #bbb;margin-left:8px;padding-left:18px}.event{margin-bottom:18px;position:relative}.event:before{content:"";width:10px;height:10px;border-radius:50%;background:#555;position:absolute;left:-24px;top:3px}
+.calendar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#bbb;border:1px solid #bbb}.day{background:#fff;min-height:150px;padding:8px}.day strong{font-size:11px}.appt{border:1px solid #aaa;background:#eee;border-radius:5px;padding:7px;margin-top:8px;font-size:11px}
+.login-wrap{min-height:calc(100vh - 68px);display:grid;place-items:center;padding:24px}.login-card{width:min(420px,100%);background:#fff;border:1px solid #bbb;border-radius:10px;padding:28px}.login-card .logo{font-size:26px;font-weight:900;margin-bottom:6px}
+.state-panel{position:fixed;inset:68px 0 0 auto;width:380px;max-width:95vw;background:#fff;border-left:1px solid #aaa;z-index:20;padding:20px;box-shadow:-8px 0 20px rgba(0,0,0,.08);display:none;overflow:auto}.state-panel.open{display:block}.state-demo{border:1px dashed #999;border-radius:7px;padding:13px;margin:10px 0}.skeleton{height:10px;background:#ddd;border-radius:4px;margin:8px 0}.skeleton.short{width:55%}
+.mobile-toggle{display:none}
+.mapbox{height:180px;border:1px dashed #999;background:repeating-linear-gradient(45deg,#f6f6f6,#f6f6f6 12px,#eee 12px,#eee 24px);display:grid;place-items:center;color:#777;border-radius:6px}
+.note{border-left:3px solid #666;padding:9px 12px;background:#f1f1f1;font-size:12px}
+@media(max-width:800px){
+ .app{grid-template-columns:1fr}.sidebar{position:fixed;z-index:30;left:-250px;width:236px;transition:.2s}.sidebar.open{left:0}.mobile-toggle{display:inline-flex}
+ .topbar{padding:0 12px}.context p{display:none}.content{padding:14px}.cols-4,.cols-3,.cols-2,.form-grid,.split,.match-layout,.property-grid{grid-template-columns:1fr}
+ .toolbar{align-items:stretch}.toolbar .left,.toolbar .right{width:100%}.toolbar input,.toolbar select,.toolbar button{flex:1;min-width:0}.header-row{flex-direction:column}
+ .calendar{grid-template-columns:1fr}.day{min-height:auto}.requirement-summary{position:static}.kanban{grid-template-columns:repeat(5,250px)}
+ .top-actions .chip{display:none}.login-wrap{min-height:calc(100vh - 68px)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">SuPra CRM<small>CRM inmobiliario · instalación única</small></div>
+  <div class="nav-section">Operación</div>
+  <button class="nav-btn" data-screen="dashboard">▦ Dashboard</button>
+  <button class="nav-btn" data-screen="companies">▣ Empresas</button>
+  <button class="nav-btn" data-screen="requirements">≡ Requerimientos</button>
+  <button class="nav-btn" data-screen="properties">⌂ Propiedades</button>
+  <button class="nav-btn" data-screen="matching">⇄ Matching</button>
+  <button class="nav-btn" data-screen="proposal">▤ Propuestas</button>
+  <button class="nav-btn" data-screen="agenda">□ Agenda</button>
+  <button class="nav-btn" data-screen="pipeline">▥ Pipeline</button>
+  <div class="nav-section">Cuenta</div>
+  <button class="nav-btn" data-screen="profile">○ Perfil</button>
+</aside>
+<main class="main">
+<header class="topbar">
+ <div style="display:flex;gap:10px;align-items:center">
+   <button class="btn mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+   <div class="context"><h1 id="pageTitle">Login</h1><p id="pageSubtitle">Acceso seguro al CRM</p></div>
+ </div>
+ <div class="top-actions">
+   <button class="chip" onclick="toggleStates()">Estados UX</button>
+   <button class="chip" data-screen="agenda">＋ Actividad</button>
+   <div class="avatar" data-screen="profile">AP</div>
+ </div>
+</header>
+
+<section class="content">
+
+<!-- LOGIN -->
+<div class="screen active" id="login">
+ <div class="login-wrap"><div class="login-card">
+   <div class="logo">SuPra CRM</div><p class="muted">Acceso para administradores y asesores.</p>
+   <div class="field"><label>Correo corporativo</label><input value="asesor@supra.pe"></div>
+   <div class="field" style="margin-top:12px"><label>Contraseña</label><input type="password" value="12345678"></div>
+   <div class="row" style="margin:14px 0"><label class="tiny"><input type="checkbox"> Mantener sesión</label><a href="#" class="tiny muted">Recuperar acceso</a></div>
+   <button class="btn primary" style="width:100%" data-screen="dashboard">Ingresar</button>
+   <p class="tiny muted" style="margin-top:14px">El acceso y permisos dependen del rol asignado en esta instalación.</p>
+ </div></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="dashboard">
+ <div class="header-row"><div><h2>Dashboard operativo</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> Hoy</span><span><b>Estado:</b> Jornada activa</span><span><b>Próxima acción:</b> Visita 16:30</span></div></div><button class="btn primary" data-screen="company-form">＋ Nueva empresa</button></div>
+ <div class="grid cols-4">
+  <div class="card"><span class="muted tiny">Requerimientos activos</span><div class="metric">18</div><span class="tiny">4 sin candidatos</span></div>
+  <div class="card"><span class="muted tiny">Visitas hoy</span><div class="metric">5</div><span class="tiny">Próxima 16:30</span></div>
+  <div class="card"><span class="muted tiny">Propuestas abiertas</span><div class="metric">7</div><span class="tiny">2 por vencer</span></div>
+  <div class="card"><span class="muted tiny">Negociaciones</span><div class="metric">6</div><span class="tiny">S/ 1.8M estimado</span></div>
+ </div>
+ <div class="grid cols-2" style="margin-top:16px">
+  <div class="card"><h3>Próximas acciones</h3><div class="stack">
+   <div class="item"><div class="row"><b>Visita · Oficina San Isidro</b><span class="status warn">Hoy 16:30</span></div><div class="meta"><span>Empresa: NovaTech</span><span>Resp.: Andrea P.</span></div></div>
+   <div class="item"><div class="row"><b>Enviar propuesta V2</b><span class="status">Mañana</span></div><div class="meta"><span>Empresa: Atlas SAC</span><span>Req: REQ-204</span></div></div>
+   <div class="item"><div class="row"><b>Llamada de negociación</b><span class="status">02 Sep</span></div><div class="meta"><span>Empresa: Delta Group</span><span>Resp.: Andrea P.</span></div></div>
+  </div></div>
+  <div class="card"><h3>Embudo resumido</h3><div class="kpi-list">
+   <div class="kpi-line"><span>Requerimiento</span><b>18</b></div><div class="kpi-line"><span>Matching</span><b>13</b></div><div class="kpi-line"><span>Propuesta</span><b>7</b></div><div class="kpi-line"><span>Visita</span><b>9</b></div><div class="kpi-line"><span>Negociación</span><b>6</b></div>
+  </div></div>
+ </div>
+</div>
+
+<!-- COMPANIES -->
+<div class="screen" id="companies">
+ <div class="header-row"><div><h2>Empresas</h2><div class="meta"><span><b>Responsable:</b> Equipo comercial</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> 128 registradas</span><span><b>Próxima acción:</b> Revisar 6 sin actividad</span></div></div><button class="btn primary" data-screen="company-form">＋ Crear empresa</button></div>
+ <div class="toolbar"><div class="left"><input placeholder="Buscar empresa, RUC o contacto"><select><option>Todos los estados</option><option>Activa</option><option>Sin requerimiento</option></select><select><option>Todos los asesores</option></select></div><div class="right"><button class="btn">Exportar vista</button></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Contacto principal</th><th>Req. activos</th><th>Responsable</th><th>Última actividad</th><th>Estado</th><th>Próxima acción</th><th>Acciones</th></tr></thead><tbody>
+ <tr><td><b>NovaTech Perú</b><br><span class="tiny muted">RUC 20601234567</span></td><td>Lucía Ramos<br><span class="tiny">Gerente Adm.</span></td><td>2</td><td>Andrea Pérez</td><td>Hoy 11:20</td><td><span class="status">Activa</span></td><td>Visita hoy 16:30</td><td><button class="btn" data-screen="company-detail">Ver</button></td></tr>
+ <tr><td><b>Atlas SAC</b></td><td>Carlos Vera</td><td>1</td><td>Diego M.</td><td>30 Ago</td><td><span class="status warn">Seguimiento</span></td><td>Enviar propuesta V2</td><td><button class="btn" data-screen="company-detail">Ver</button></td></tr>
+ <tr><td><b>Delta Group</b></td><td>Mariana Torres</td><td>1</td><td>Andrea Pérez</td><td>29 Ago</td><td><span class="status">Activa</span></td><td>Llamada 02 Sep</td><td><button class="btn" data-screen="company-detail">Ver</button></td></tr>
+ </tbody></table></div>
+</div>
+
+<!-- COMPANY DETAIL -->
+<div class="screen" id="company-detail">
+ <div class="header-row"><div><button class="btn" data-screen="companies">← Empresas</button><h2 style="margin-top:12px">NovaTech Perú</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha alta:</b> 18 Ago 2026</span><span><b>Estado:</b> Activa</span><span><b>Próxima acción:</b> Visita hoy 16:30</span></div></div><button class="btn" data-screen="company-form">Editar empresa</button></div>
+ <div class="tabs"><button class="tab active">Resumen</button><button class="tab">Contactos (3)</button><button class="tab">Requerimientos (2)</button><button class="tab">Actividad</button></div>
+ <div class="grid cols-3">
+  <div class="card"><h3>Datos de empresa</h3><p><b>RUC:</b> 20601234567</p><p><b>Sector:</b> Tecnología</p><p><b>Web:</b> novatech.pe</p><p><b>Dirección:</b> Miraflores, Lima</p></div>
+  <div class="card"><h3>Contacto principal</h3><p><b>Lucía Ramos</b></p><p class="muted">Gerente de Administración</p><p>lucia@novatech.pe</p><p>+51 999 000 111</p><button class="btn">Ver contactos</button></div>
+  <div class="card"><h3>Resumen comercial</h3><p>2 requerimientos activos</p><p>1 propuesta abierta</p><p>1 visita programada</p><p>Último contacto: hoy</p></div>
+ </div>
+ <div class="card" style="margin-top:16px"><div class="row"><h3>Requerimientos activos</h3><button class="btn primary" data-screen="requirements">＋ Crear requerimiento</button></div>
+  <div class="item"><div class="row"><b>REQ-204 · Oficina corporativa 600–800 m²</b><span class="status warn">Matching</span></div><div class="meta"><span>Presupuesto: US$ 14k–18k/mes</span><span>Zona: San Isidro / Miraflores</span><span>Próxima: Seleccionar candidatos</span></div><button class="btn" data-screen="requirement-detail">Abrir</button></div>
+ </div>
+</div>
+
+<!-- COMPANY FORM -->
+<div class="screen" id="company-form">
+ <div class="header-row"><div><button class="btn" data-screen="companies">← Volver</button><h2 style="margin-top:12px">Nueva empresa y contacto</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> Borrador</span><span><b>Próxima acción:</b> Guardar datos</span></div></div></div>
+ <div class="form-section"><h3>1. Empresa</h3><div class="form-grid">
+   <div class="field"><label>Razón social *</label><input placeholder="Ej. NovaTech Perú SAC"></div><div class="field"><label>RUC *</label><input placeholder="11 dígitos"></div><div class="field"><label>Nombre comercial</label><input></div>
+   <div class="field"><label>Sector</label><select><option>Seleccionar</option><option>Tecnología</option></select></div><div class="field"><label>Sitio web</label><input placeholder="https://"></div><div class="field"><label>Responsable interno *</label><select><option>Andrea Pérez</option></select></div>
+ </div></div>
+ <div class="form-section"><h3>2. Contacto principal</h3><div class="form-grid">
+   <div class="field"><label>Nombres y apellidos *</label><input></div><div class="field"><label>Cargo</label><input></div><div class="field"><label>Área</label><input></div>
+   <div class="field"><label>Correo *</label><input></div><div class="field"><label>Teléfono</label><input></div><div class="field"><label>Canal preferido</label><select><option>Correo</option><option>Teléfono</option></select></div>
+ </div></div>
+ <div class="note">Validación esperada: RUC duplicado, correo inválido y campos obligatorios se muestran junto al campo, no solo como alerta global.</div>
+ <div class="row" style="margin-top:14px"><button class="btn" data-screen="companies">Cancelar</button><button class="btn primary" data-screen="company-detail">Guardar empresa</button></div>
+</div>
+
+<!-- REQUIREMENTS -->
+<div class="screen" id="requirements">
+ <div class="header-row"><div><h2>Requerimientos inmobiliarios</h2><div class="meta"><span><b>Responsable:</b> Equipo comercial</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> 18 activos</span><span><b>Próxima acción:</b> 4 requieren matching</span></div></div><button class="btn primary" data-screen="requirement-detail">＋ Nuevo requerimiento</button></div>
+ <div class="toolbar"><div class="left"><input placeholder="Buscar por ID, empresa o zona"><select><option>Todos los estados</option></select><select><option>Tipo de inmueble</option></select></div></div>
+ <div class="table-wrap"><table><thead><tr><th>ID / Empresa</th><th>Tipo / Zona</th><th>Rango</th><th>Responsable</th><th>Fecha</th><th>Estado</th><th>Próxima acción</th><th>Acción</th></tr></thead><tbody>
+ <tr><td><b>REQ-204</b><br>NovaTech Perú</td><td>Oficina<br>San Isidro / Miraflores</td><td>600–800 m²<br>US$ 14k–18k</td><td>Andrea Pérez</td><td>28 Ago</td><td><span class="status warn">Matching</span></td><td>Seleccionar candidatos</td><td><button class="btn" data-screen="requirement-detail">Ver</button></td></tr>
+ <tr><td><b>REQ-198</b><br>Atlas SAC</td><td>Local comercial<br>Surco</td><td>250–400 m²</td><td>Diego M.</td><td>25 Ago</td><td><span class="status">Propuesta</span></td><td>Enviar V2</td><td><button class="btn" data-screen="requirement-detail">Ver</button></td></tr>
+ </tbody></table></div>
+</div>
+
+<!-- REQUIREMENT DETAIL -->
+<div class="screen" id="requirement-detail">
+ <div class="header-row"><div><button class="btn" data-screen="requirements">← Requerimientos</button><h2 style="margin-top:12px">REQ-204 · Oficina corporativa</h2><div class="meta"><span><b>Empresa:</b> NovaTech Perú</span><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> 28 Ago 2026</span><span><b>Estado:</b> Matching</span><span><b>Próxima acción:</b> Comparar candidatos</span></div></div><button class="btn primary" data-screen="matching">Buscar propiedades</button></div>
+ <div class="split">
+  <div class="stack">
+   <div class="card"><h3>Necesidad</h3><p>Oficina corporativa para 80–100 colaboradores.</p><div class="grid cols-2"><p><b>Área:</b> 600–800 m²</p><p><b>Operación:</b> Alquiler</p><p><b>Presupuesto:</b> US$ 14k–18k/mes</p><p><b>Fecha objetivo:</b> Oct 2026</p></div></div>
+   <div class="card"><h3>Ubicación y criterios</h3><p><b>Zonas:</b> San Isidro, Miraflores</p><p><b>Obligatorios:</b> 12 estacionamientos, sala directorio, seguridad 24/7, acceso a transporte.</p><p><b>Deseables:</b> Certificación sostenible, terraza.</p></div>
+  </div>
+  <div class="card"><h3>Historial y siguiente paso</h3><div class="timeline"><div class="event"><b>28 Ago · Requerimiento creado</b><p class="muted">Por Andrea Pérez</p></div><div class="event"><b>29 Ago · Criterios confirmados</b><p class="muted">Llamada con Lucía Ramos</p></div><div class="event"><b>Hoy · Matching pendiente</b><p class="muted">Próxima acción operativa</p></div></div></div>
+ </div>
+</div>
+
+<!-- PROPERTIES -->
+<div class="screen" id="properties">
+ <div class="header-row"><div><h2>Propiedades</h2><div class="meta"><span><b>Responsable:</b> Equipo comercial</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> 342 disponibles</span><span><b>Próxima acción:</b> Verificar 12 fichas</span></div></div><button class="btn primary">＋ Nueva propiedad</button></div>
+ <div class="toolbar"><div class="left"><input placeholder="Código, dirección o propietario"><select><option>Tipo</option></select><select><option>Distrito</option></select><select><option>Disponibilidad</option></select></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Propiedad</th><th>Tipo / área</th><th>Ubicación</th><th>Precio</th><th>Responsable</th><th>Fecha verificación</th><th>Estado</th><th>Próxima acción</th></tr></thead><tbody>
+ <tr><td><b>PROP-087</b><br>Torre Central, piso 12</td><td>Oficina · 720 m²</td><td>San Isidro</td><td>US$ 16,500/mes</td><td>Andrea Pérez</td><td>30 Ago</td><td><span class="status done">Disponible</span></td><td><button class="btn" data-screen="property-detail">Ver ficha</button></td></tr>
+ <tr><td><b>PROP-091</b><br>Edificio Parque</td><td>Oficina · 680 m²</td><td>Miraflores</td><td>US$ 15,800/mes</td><td>Diego M.</td><td>29 Ago</td><td><span class="status warn">Por verificar</span></td><td>Confirmar disponibilidad</td></tr>
+ </tbody></table></div>
+</div>
+
+<!-- PROPERTY DETAIL -->
+<div class="screen" id="property-detail">
+ <div class="header-row"><div><button class="btn" data-screen="properties">← Propiedades</button><h2 style="margin-top:12px">PROP-087 · Torre Central, piso 12</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha verificación:</b> 30 Ago 2026</span><span><b>Estado:</b> Disponible</span><span><b>Próxima acción:</b> Asociar a propuesta</span></div></div><button class="btn" data-screen="matching">Usar en matching</button></div>
+ <div class="split"><div class="stack">
+  <div class="card"><h3>Ficha comercial</h3><div class="grid cols-2"><p><b>Tipo:</b> Oficina</p><p><b>Área:</b> 720 m²</p><p><b>Precio:</b> US$ 16,500/mes</p><p><b>Mantenimiento:</b> US$ 2.8/m²</p><p><b>Estacionamientos:</b> 14</p><p><b>Disponibilidad:</b> Inmediata</p></div></div>
+  <div class="card"><h3>Características</h3><p>Recepción, open space, 6 salas, directorio, kitchenette, seguridad 24/7.</p></div>
+ </div><div class="card"><h3>Ubicación</h3><div class="mapbox">Mapa / ubicación referencial<br><span class="tiny">Sin fotografía en baja fidelidad</span></div><p>Av. República de Panamá · San Isidro</p></div></div>
+</div>
+
+<!-- MATCHING -->
+<div class="screen" id="matching">
+ <div class="header-row"><div><h2>Matching · REQ-204</h2><div class="meta"><span><b>Empresa:</b> NovaTech Perú</span><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> Selección</span><span><b>Próxima acción:</b> Crear propuesta</span></div></div><button class="btn primary" data-screen="proposal">Crear propuesta con seleccionadas</button></div>
+ <div class="match-layout">
+  <aside class="card requirement-summary"><h3>Criterios del requerimiento</h3><p><b>Área:</b> 600–800 m²</p><p><b>Zonas:</b> San Isidro / Miraflores</p><p><b>Presupuesto:</b> US$ 14k–18k</p><p><b>Obligatorios:</b> 12 estacionamientos, seguridad, directorio</p><hr><label class="field"><span>Ordenar por</span><select><option>Mayor compatibilidad</option><option>Menor precio</option></select></label></aside>
+  <div class="property-grid">
+   <div class="prop"><div class="row"><div><b>PROP-087 · Torre Central</b><p class="muted">San Isidro · 720 m²</p></div><div class="score">92%</div></div><p>US$ 16,500/mes · 14 estac.</p><p class="tiny">✓ Zona · ✓ Área · ✓ Presupuesto · ✓ Estacionamientos</p><label class="checkline"><input type="checkbox" checked> Incluir como candidata</label><button class="btn" data-screen="property-detail">Ver detalle</button></div>
+   <div class="prop"><div class="row"><div><b>PROP-091 · Edificio Parque</b><p class="muted">Miraflores · 680 m²</p></div><div class="score">86%</div></div><p>US$ 15,800/mes · 10 estac.</p><p class="tiny">✓ Zona · ✓ Área · ✓ Presupuesto · ▲ Estacionamientos</p><label class="checkline"><input type="checkbox" checked> Incluir como candidata</label><button class="btn">Ver detalle</button></div>
+   <div class="prop"><div class="row"><div><b>PROP-102 · Centro Empresarial</b><p class="muted">San Isidro · 790 m²</p></div><div class="score">79%</div></div><p>US$ 18,900/mes · 16 estac.</p><p class="tiny">✓ Zona · ✓ Área · ▲ Presupuesto · ✓ Estacionamientos</p><label class="checkline"><input type="checkbox"> Incluir como candidata</label><button class="btn">Ver detalle</button></div>
+  </div>
+ </div>
+ <div class="note" style="margin-top:14px"><b>Modelo de datos:</b> marcar una propiedad aquí solo la prepara como candidata. La relación efectiva Requirement–Property se registra al crear la Proposal.</div>
+</div>
+
+<!-- PROPOSAL -->
+<div class="screen" id="proposal">
+ <div class="header-row"><div><h2>Constructor de propuesta · REQ-204</h2><div class="meta"><span><b>Empresa:</b> NovaTech Perú</span><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> Borrador</span><span><b>Próxima acción:</b> Enviar a contacto</span></div></div><button class="btn primary" onclick="alert('Prototipo: propuesta marcada como enviada')">Guardar y enviar</button></div>
+ <div class="split"><div class="stack">
+  <div class="form-section"><h3>1. Encabezado</h3><div class="form-grid"><div class="field"><label>Contacto</label><select><option>Lucía Ramos</option></select></div><div class="field"><label>Vigencia</label><input value="7 días"></div><div class="field"><label>Asunto</label><input value="Opciones de oficina corporativa"></div></div></div>
+  <div class="form-section"><h3>2. Propiedades candidatas</h3>
+    <div class="item"><div class="row"><b>PROP-087 · Torre Central</b><span class="status done">Incluida</span></div><p>720 m² · US$ 16,500/mes · 14 estacionamientos</p><textarea>Comentario comercial: mejor ajuste general al requerimiento.</textarea></div>
+    <div class="item" style="margin-top:8px"><div class="row"><b>PROP-091 · Edificio Parque</b><span class="status done">Incluida</span></div><p>680 m² · US$ 15,800/mes · 10 estacionamientos</p><textarea>Comentario comercial: menor precio, validar estacionamientos adicionales.</textarea></div>
+  </div>
+ </div>
+ <div class="card"><h3>Resumen antes de enviar</h3><p><b>Empresa:</b> NovaTech Perú</p><p><b>Requerimiento:</b> REQ-204</p><p><b>Candidatas:</b> 2</p><p><b>Vigencia:</b> 7 días</p><hr><label class="checkline"><input type="checkbox" checked> Registrar actividad “Propuesta enviada”</label><label class="checkline"><input type="checkbox" checked> Crear próxima acción de seguimiento</label><p class="tiny muted">Estas acciones requieren confirmación humana; no son automatizaciones autónomas.</p></div></div>
+</div>
+
+<!-- AGENDA -->
+<div class="screen" id="agenda">
+ <div class="header-row"><div><h2>Agenda de actividades y visitas</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> Semana 31 Ago–04 Sep</span><span><b>Estado:</b> 12 actividades</span><span><b>Próxima acción:</b> Visita hoy 16:30</span></div></div><button class="btn primary" onclick="document.getElementById('activityForm').style.display='block'">＋ Nueva actividad</button></div>
+ <div class="calendar">
+  <div class="day"><strong>LUN 31</strong><div class="appt">10:00 · Llamada<br>Atlas SAC</div><div class="appt">16:30 · VISITA<br>NovaTech · PROP-087</div></div>
+  <div class="day"><strong>MAR 01</strong><div class="appt">09:30 · Seguimiento<br>Delta Group</div></div>
+  <div class="day"><strong>MIÉ 02</strong><div class="appt">11:00 · Negociación<br>Delta Group</div></div>
+  <div class="day"><strong>JUE 03</strong><div class="appt">15:00 · Visita<br>Atlas SAC</div></div>
+  <div class="day"><strong>VIE 04</strong><div class="appt">12:30 · Revisión propuesta</div></div>
+ </div>
+ <div id="activityForm" class="form-section" style="display:none;margin-top:16px"><div class="row"><h3>Nueva actividad / visita</h3><button class="btn" onclick="this.parentElement.parentElement.style.display='none'">×</button></div><div class="form-grid"><div class="field"><label>Tipo</label><select><option>Visita</option><option>Llamada</option><option>Reunión</option></select></div><div class="field"><label>Fecha y hora</label><input value="2026-08-31 16:30"></div><div class="field"><label>Responsable</label><select><option>Andrea Pérez</option></select></div><div class="field"><label>Empresa</label><select><option>NovaTech Perú</option></select></div><div class="field"><label>Requerimiento</label><select><option>REQ-204</option></select></div><div class="field"><label>Propiedad (opcional)</label><select><option>PROP-087</option></select></div><div class="field full"><label>Objetivo / notas</label><textarea></textarea></div></div><button class="btn primary">Guardar actividad</button></div>
+</div>
+
+<!-- PIPELINE -->
+<div class="screen" id="pipeline">
+ <div class="header-row"><div><h2>Pipeline de operaciones</h2><div class="meta"><span><b>Responsable:</b> Equipo comercial</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> 31 oportunidades</span><span><b>Próxima acción:</b> 6 negociaciones activas</span></div></div><button class="btn">Vista tabla</button></div>
+ <div class="kanban">
+  <div class="lane"><h3>REQUERIMIENTO · 8</h3><div class="deal"><strong>REQ-211 · Kairo</strong><span class="tiny">Andrea P. · 30 Ago</span><p>Próxima: completar criterios</p></div></div>
+  <div class="lane"><h3>PROPUESTA · 7</h3><div class="deal"><strong>Atlas SAC · REQ-198</strong><span class="tiny">Diego M. · 30 Ago</span><p>Próxima: enviar V2</p></div></div>
+  <div class="lane"><h3>VISITA · 5</h3><div class="deal"><strong>NovaTech · REQ-204</strong><span class="tiny">Andrea P. · hoy</span><p>Próxima: visita 16:30</p></div></div>
+  <div class="lane"><h3>NEGOCIACIÓN · 6</h3><div class="deal"><strong>Delta Group · REQ-188</strong><span class="tiny">Andrea P. · 29 Ago</span><p>Próxima: llamada 02 Sep</p><button class="btn" onclick="alert('Prototipo: abrir operación')">Gestionar</button></div></div>
+  <div class="lane"><h3>CIERRE · 5</h3><div class="deal"><strong>Orion SAC · REQ-176</strong><span class="status done">Ganada</span><p>US$ 320k · 27 Ago</p></div><div class="deal"><strong>Vértice · REQ-171</strong><span class="status stop">Rechazada</span><p>Motivo: presupuesto</p></div></div>
+ </div>
+ <div class="note">El cierre exige registrar resultado, fecha, responsable y motivo cuando la operación es rechazada. No se incluyen facturación ni procesos ERP.</div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="profile">
+ <div class="header-row"><div><h2>Perfil de usuario</h2><div class="meta"><span><b>Responsable:</b> Andrea Pérez</span><span><b>Fecha:</b> 31 Ago 2026</span><span><b>Estado:</b> Activo</span><span><b>Próxima acción:</b> —</span></div></div></div>
+ <div class="split"><div class="card"><h3>Datos personales</h3><div class="form-grid" style="grid-template-columns:1fr 1fr"><div class="field"><label>Nombre</label><input value="Andrea Pérez"></div><div class="field"><label>Correo</label><input value="andrea@supra.pe"></div><div class="field"><label>Rol</label><input value="Asesor inmobiliario" disabled></div><div class="field"><label>Teléfono</label><input value="+51 999 111 222"></div></div><button class="btn primary" style="margin-top:12px">Guardar cambios</button></div>
+ <div class="card"><h3>Sesión</h3><p><b>Rol:</b> Asesor inmobiliario</p><p><b>Último acceso:</b> hoy 08:42</p><p><b>Permisos:</b> operación comercial</p><hr><button class="btn danger" data-screen="login">Cerrar sesión</button><p class="tiny muted">Administrador tendría acceso adicional a usuarios y configuración.</p></div></div>
+</div>
+
+</section>
+</main>
+</div>
+
+<aside class="state-panel" id="statePanel">
+ <div class="row"><h2 style="margin:0">Estados UX</h2><button class="btn" onclick="toggleStates()">×</button></div>
+ <p class="muted">Patrones reutilizables para cualquier módulo.</p>
+ <div class="state-demo"><b>Loading</b><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div></div>
+ <div class="state-demo"><b>Vacío</b><p>No hay propuestas para este requerimiento.</p><button class="btn primary" data-screen="matching" onclick="toggleStates()">Buscar propiedades</button></div>
+ <div class="state-demo"><b>Error</b><p>No pudimos cargar la información. Conservamos tus filtros.</p><button class="btn">Reintentar</button></div>
+ <div class="state-demo"><b>Validación</b><p><b>Correo *</b></p><input value="lucia@" style="border-width:2px"><p class="tiny">Ingresa un correo válido.</p></div>
+ <div class="state-demo"><b>Sin permisos</b><p>Tu rol no permite administrar usuarios.</p><button class="btn" data-screen="dashboard" onclick="toggleStates()">Volver al dashboard</button></div>
+</aside>
+
+<script>
+const titles={
+ login:['Login','Acceso seguro al CRM'],
+ dashboard:['Dashboard','Prioridades y carga operativa'],
+ companies:['Empresas','Cuentas corporativas y contactos'],
+ 'company-detail':['Detalle de empresa','Contexto comercial consolidado'],
+ 'company-form':['Nueva empresa','Alta de empresa y contacto'],
+ requirements:['Requerimientos','Necesidades inmobiliarias activas'],
+ 'requirement-detail':['Detalle de requerimiento','Criterios, estado y próximos pasos'],
+ properties:['Propiedades','Inventario inmobiliario independiente'],
+ 'property-detail':['Detalle de propiedad','Ficha comercial y disponibilidad'],
+ matching:['Matching','Comparación de propiedades candidatas'],
+ proposal:['Propuesta','Selección formal de candidatos'],
+ agenda:['Agenda','Actividades, reuniones y visitas'],
+ pipeline:['Pipeline','Negociaciones y operaciones'],
+ profile:['Perfil','Cuenta, rol y sesión']
+};
+function showScreen(id){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+ const el=document.getElementById(id); if(!el)return;
+ el.classList.add('active');
+ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.screen===id));
+ const t=titles[id]||['SuPra CRM','']; document.getElementById('pageTitle').textContent=t[0];document.getElementById('pageSubtitle').textContent=t[1];
+ window.scrollTo(0,0); document.getElementById('sidebar').classList.remove('open');
+}
+document.querySelectorAll('[data-screen]').forEach(el=>el.addEventListener('click',()=>showScreen(el.dataset.screen)));
+function toggleStates(){document.getElementById('statePanel').classList.toggle('open')}
+showScreen('login');
+</script>
+</body></html>
