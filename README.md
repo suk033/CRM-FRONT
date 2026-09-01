@@ -6,13 +6,13 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 
 1. Copiá `env.example` como `.env.local`.
 2. Configurá `VITE_API_BASE_URL` con el origen del backend; esta variable no debe contener secretos.
-3. Ejecutá `npm ci` y `npm run dev`.
+3. Ejecutá `pnpm install --frozen-lockfile` y `pnpm dev`.
 
 ## Calidad
 
-Ejecutá `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`, `npm run build` y `npm run openapi:check`.
+Ejecutá `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` y `pnpm openapi:check`.
 
-La instantánea de OpenAPI se encuentra en `src/api/openapi.json` y su esquema TypeScript generado en `src/api/schema.ts`. Después de reemplazar la instantánea, ejecutá `npm run openapi:generate` y luego `npm run openapi:check` para comprobar que no exista deriva del contrato.
+La instantánea de OpenAPI se encuentra en `src/api/openapi.json` y su esquema TypeScript generado en `src/api/schema.ts`. Después de reemplazar la instantánea, ejecutá `pnpm openapi:generate` y luego `pnpm openapi:check` para comprobar que no exista deriva del contrato.
 
 ## Contenedor
 
