@@ -1,0 +1,107 @@
+:root {
+  --color-text: #1e293b;
+  --color-surface: #f8fafc;
+  --color-accent: #2563eb;
+  --color-accent-text: #1d4ed8;
+  --color-heading: #0f172a;
+  --color-muted: #475569;
+  --color-card: #fff;
+  --color-border: #e2e8f0;
+  --shadow-card: 0 1rem 2.5rem rgb(15 23 42 / 0.08);
+  --space-2xs: 0.375rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.25rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.5rem;
+  --space-3xl: 5rem;
+  --space-4xl: 6rem;
+  --radius-card: 0.75rem;
+  --tracking-caps: 0.12em;
+  --tracking-tight: -0.055em;
+  --focus-outline: 0.1875rem solid var(--color-accent);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 20rem;
+}
+.foundation-shell {
+  display: grid;
+  gap: clamp(var(--space-xl), 6vw, var(--space-3xl));
+  min-height: 100vh;
+  padding: clamp(var(--space-lg), 6vw, var(--space-4xl));
+  place-content: center;
+}
+.foundation-hero,
+.foundation-status {
+  max-width: 44rem;
+}
+.foundation-hero {
+  border-left: var(--space-2xs) solid var(--color-accent);
+  padding-left: clamp(var(--space-sm), 3vw, var(--space-xl));
+}
+.eyebrow {
+  color: var(--color-accent-text);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: var(--tracking-caps);
+  margin: 0 0 var(--space-sm);
+}
+h1,
+h2 {
+  color: var(--color-heading);
+  line-height: 1.1;
+}
+h1 {
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+  text-wrap: balance;
+}
+h2 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  margin: 0;
+}
+.lede {
+  color: var(--color-muted);
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  max-width: 36rem;
+}
+.foundation-status {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: clamp(var(--space-lg), 4vw, var(--space-2xl));
+}
+.foundation-status ul {
+  color: var(--color-muted);
+  margin: var(--space-sm) 0 0;
+  padding-left: var(--space-md);
+}
+.foundation-status li + li {
+  margin-top: var(--space-xs);
+}
+:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--space-2xs);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
