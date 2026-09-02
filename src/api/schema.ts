@@ -71,7 +71,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get Companies */
+        get: operations["get_companies_api_v1_companies_get"];
         put?: never;
         /** Post Company */
         post: operations["post_company_api_v1_companies_post"];
@@ -148,6 +149,17 @@ export interface components {
             created_at: string;
             /** Contacts */
             contacts: components["schemas"]["ContactResponse"][];
+        };
+        /** CompanyListResponse */
+        CompanyListResponse: {
+            /** Items */
+            items: components["schemas"]["CompanyResponse"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
         };
         /** CompanyResponse */
         CompanyResponse: {
@@ -359,6 +371,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CurrentUserResponse"];
+                };
+            };
+        };
+    };
+    get_companies_api_v1_companies_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

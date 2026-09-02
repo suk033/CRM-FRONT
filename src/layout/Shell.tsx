@@ -1,10 +1,13 @@
+import type { ReactNode } from "react";
+import { NavLink } from "react-router-dom";
 import type { components } from "../api/schema";
 
 type Props = {
   user?: components["schemas"]["CurrentUserResponse"];
   onLogout: () => void;
+  children: ReactNode;
 };
-export function Shell({ user, onLogout }: Props) {
+export function Shell({ user, onLogout, children }: Props) {
   const role = user?.role === "admin" ? "Administrador" : "Asesor";
   return (
     <div className="app-shell">
@@ -19,21 +22,13 @@ export function Shell({ user, onLogout }: Props) {
         </div>
       </header>
       <nav aria-label="Módulos">
-        <button aria-current="page">Inicio</button>
-        {["Empresas", "Contactos", "Reportes"].map((module) => (
-          <button key={module} disabled>
-            {module} · Próximamente
-          </button>
-        ))}
+        <NavLink to="/" end>
+          Inicio
+        </NavLink>
+        <NavLink to="/empresas">Empresas</NavLink>
+        <button disabled>Reportes · Próximamente</button>
       </nav>
-      <main>
-        <p className="eyebrow">ESPACIO DE TRABAJO</p>
-        <h1>Inicio</h1>
-        <p>
-          Tu acceso está listo. Los módulos del CRM estarán disponibles
-          próximamente.
-        </p>
-      </main>
+      {children}
     </div>
   );
 }

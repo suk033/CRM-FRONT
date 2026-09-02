@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import {
   api,
   getAccessToken,
@@ -37,8 +37,14 @@ export function AuthenticatedApp() {
     client.removeQueries({ queryKey: userKey });
   };
   if (!token) return <Navigate to="/login" replace />;
-  if (user.isError) return <Navigate to="/login" replace />;
-  return <Shell user={user.data} onLogout={logout} />;
+  if (user.isPending)
+    return <main className="loading-page">Cargando sesión…</main>;
+  if (user.isError || !user.data) return <Navigate to="/login" replace />;
+  return (
+    <Shell user={user.data} onLogout={logout}>
+      <Outlet />
+    </Shell>
+  );
 }
 
 export function Login() {
