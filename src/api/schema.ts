@@ -64,7 +64,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/companies": {
+    "/api/v1/companies/{company_id}/assignment": {
         parameters: {
             query?: never;
             header?: never;
@@ -72,6 +72,24 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /** Put Company Assignment */
+        put: operations["put_company_assignment_api_v1_companies__company_id__assignment_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Companies */
+        get: operations["get_companies_api_v1_companies_get"];
         put?: never;
         /** Post Company */
         post: operations["post_company_api_v1_companies_post"];
@@ -115,10 +133,286 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/owners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Owners */
+        get: operations["get_owners_api_v1_owners_get"];
+        put?: never;
+        /** Post Owner */
+        post: operations["post_owner_api_v1_owners_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/properties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Properties */
+        get: operations["get_properties_api_v1_properties_get"];
+        put?: never;
+        /** Post Property */
+        post: operations["post_property_api_v1_properties_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/properties/{property_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Property */
+        get: operations["get_property_api_v1_properties__property_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/requirements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Requirements */
+        get: operations["get_requirements_api_v1_requirements_get"];
+        put?: never;
+        /** Post Requirement */
+        post: operations["post_requirement_api_v1_requirements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/requirements/{requirement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Requirement */
+        get: operations["get_requirement_api_v1_requirements__requirement_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/requirements/{requirement_id}/matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Matches
+         * @description Return the stored candidates ranked by the active model, or by rules when none is active.
+         */
+        get: operations["get_matches_api_v1_requirements__requirement_id__matches_get"];
+        put?: never;
+        /**
+         * Post Matches
+         * @description Score every property in the requirement's city with the transparent rules.
+         */
+        post: operations["post_matches_api_v1_requirements__requirement_id__matches_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/requirements/{requirement_id}/candidates/{candidate_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Decision
+         * @description Record the human decision; accepted and rejected decisions become training evidence.
+         */
+        put: operations["put_decision_api_v1_requirements__requirement_id__candidates__candidate_id__decision_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/requirements/{requirement_id}/proposal/optimize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Proposal
+         * @description Compose the proposal with steepest-ascent hill climbing over candidate subsets.
+         */
+        post: operations["post_proposal_api_v1_requirements__requirement_id__proposal_optimize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Visit Route
+         * @description Order property visits with uninformed BFS and informed A*, and compare their effort.
+         */
+        post: operations["post_visit_route_api_v1_routes_visits_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ml/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Evidence */
+        get: operations["get_evidence_api_v1_ml_evidence_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ml/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Model
+         * @description Train and activate a new logistic regression version from recorded decisions.
+         */
+        post: operations["post_model_api_v1_ml_models_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CandidateDecision */
+        CandidateDecision: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "shortlisted" | "accepted" | "rejected";
+            /** Reason */
+            reason?: string | null;
+        };
+        /** CandidateResponse */
+        CandidateResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            property: components["schemas"]["PropertyResponse"];
+            /** Rule Score */
+            rule_score: number;
+            /** Features */
+            features: {
+                [key: string]: number;
+            };
+            /** Rule Contributions */
+            rule_contributions: {
+                [key: string]: number;
+            };
+            /** Gaps */
+            gaps: string[];
+            /** Ml Probability */
+            ml_probability: number | null;
+            /** Ml Contributions */
+            ml_contributions: {
+                [key: string]: number;
+            } | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "suggested" | "shortlisted" | "accepted" | "rejected";
+            /** Decision Reason */
+            decision_reason: string | null;
+            /** Decided At */
+            decided_at: string | null;
+        };
+        /** CompanyAssignment */
+        CompanyAssignment: {
+            /**
+             * Assigned Advisor Id
+             * Format: uuid
+             */
+            assigned_advisor_id: string;
+        };
+        /** CompanyAssignmentReceipt */
+        CompanyAssignmentReceipt: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /**
+             * Assigned Advisor Id
+             * Format: uuid
+             */
+            assigned_advisor_id: string;
+        };
         /** CompanyCreate */
         CompanyCreate: {
             /** Legal Name */
@@ -148,6 +442,17 @@ export interface components {
             created_at: string;
             /** Contacts */
             contacts: components["schemas"]["ContactResponse"][];
+        };
+        /** CompanyListResponse */
+        CompanyListResponse: {
+            /** Items */
+            items: components["schemas"]["CompanyResponse"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
         };
         /** CompanyResponse */
         CompanyResponse: {
@@ -231,6 +536,29 @@ export interface components {
              */
             created_at: string;
         };
+        /** EvidenceResponse */
+        EvidenceResponse: {
+            /** Decisions */
+            decisions: number;
+            /** Accepted */
+            accepted: number;
+            /** Rejected */
+            rejected: number;
+            /** Min Samples */
+            min_samples: number;
+            /** Min Per Class */
+            min_per_class: number;
+            /** Trainable */
+            trainable: boolean;
+            active_model: components["schemas"]["ModelResponse"] | null;
+        };
+        /** GeoPoint */
+        GeoPoint: {
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -250,6 +578,358 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** MatchResponse */
+        MatchResponse: {
+            requirement: components["schemas"]["RequirementResponse"];
+            /**
+             * Ranking
+             * @enum {string}
+             */
+            ranking: "rules" | "model";
+            /** Model Version */
+            model_version: number | null;
+            /** Candidates */
+            candidates: components["schemas"]["CandidateResponse"][];
+        };
+        /** ModelResponse */
+        ModelResponse: {
+            /** Version */
+            version: number;
+            /** Algorithm */
+            algorithm: string;
+            /** Feature Names */
+            feature_names: string[];
+            /** Coefficients */
+            coefficients: number[];
+            /** Intercept */
+            intercept: number;
+            /** Metrics */
+            metrics: {
+                [key: string]: unknown;
+            };
+            /** Sample Count */
+            sample_count: number;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Trained At
+             * Format: date-time
+             */
+            trained_at: string;
+        };
+        /** OwnerCreate */
+        OwnerCreate: {
+            /** Full Name */
+            full_name: string;
+            /** Document Id */
+            document_id?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Email */
+            email?: string | null;
+            /**
+             * Is Strategic
+             * @default false
+             */
+            is_strategic: boolean;
+        };
+        /** OwnerListResponse */
+        OwnerListResponse: {
+            /** Items */
+            items: components["schemas"]["OwnerResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** OwnerResponse */
+        OwnerResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Full Name */
+            full_name: string;
+            /** Document Id */
+            document_id: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Email */
+            email: string | null;
+            /** Is Strategic */
+            is_strategic: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** PropertyCreate */
+        PropertyCreate: {
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Property Type
+             * @enum {string}
+             */
+            property_type: "retail" | "office" | "warehouse" | "land";
+            /** City */
+            city: string;
+            /** District */
+            district: string;
+            /** Address */
+            address: string;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Area M2 */
+            area_m2: number | string;
+            /**
+             * Floors
+             * @default 1
+             */
+            floors: number;
+            /** Monthly Rent */
+            monthly_rent: number | string;
+            /**
+             * Currency
+             * @default PEN
+             * @enum {string}
+             */
+            currency: "PEN" | "USD";
+            /** Features */
+            features?: string[];
+            /**
+             * Status
+             * @default available
+             * @enum {string}
+             */
+            status: "available" | "reserved" | "rented";
+            /**
+             * Is Strategic Stock
+             * @default false
+             */
+            is_strategic_stock: boolean;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** PropertyListResponse */
+        PropertyListResponse: {
+            /** Items */
+            items: components["schemas"]["PropertyResponse"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PropertyResponse */
+        PropertyResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Property Type
+             * @enum {string}
+             */
+            property_type: "retail" | "office" | "warehouse" | "land";
+            /** City */
+            city: string;
+            /** District */
+            district: string;
+            /** Address */
+            address: string;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Area M2 */
+            area_m2: number;
+            /** Floors */
+            floors: number;
+            /** Monthly Rent */
+            monthly_rent: number;
+            /** Currency */
+            currency: string;
+            /** Features */
+            features: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "reserved" | "rented";
+            /** Is Strategic Stock */
+            is_strategic_stock: boolean;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ProposalRequest */
+        ProposalRequest: {
+            /**
+             * Size
+             * @default 3
+             */
+            size: number;
+            /** Total Budget */
+            total_budget?: number | null;
+            /**
+             * Restarts
+             * @default 5
+             */
+            restarts: number;
+            /**
+             * Seed
+             * @default 7
+             */
+            seed: number;
+        };
+        /** ProposalResponse */
+        ProposalResponse: {
+            /**
+             * Algorithm
+             * @constant
+             */
+            algorithm: "hill_climbing";
+            /**
+             * Objective Source
+             * @enum {string}
+             */
+            objective_source: "rules" | "model";
+            /** Selected */
+            selected: components["schemas"]["CandidateResponse"][];
+            /** Objective */
+            objective: number;
+            /** Initial Property Ids */
+            initial_property_ids: string[];
+            /** Initial Objective */
+            initial_objective: number;
+            /** Iterations */
+            iterations: number;
+            /** Restarts */
+            restarts: number;
+            /** History */
+            history: number[];
+        };
+        /** RequirementCreate */
+        RequirementCreate: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Property Type
+             * @enum {string}
+             */
+            property_type: "retail" | "office" | "warehouse" | "land";
+            /** City */
+            city: string;
+            /** Districts */
+            districts?: string[];
+            /** Min Area M2 */
+            min_area_m2: number | string;
+            /** Max Area M2 */
+            max_area_m2: number | string;
+            /** Max Monthly Budget */
+            max_monthly_budget: number | string;
+            /** Required Features */
+            required_features?: string[];
+        };
+        /** RequirementListResponse */
+        RequirementListResponse: {
+            /** Items */
+            items: components["schemas"]["RequirementResponse"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** RequirementResponse */
+        RequirementResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Property Type
+             * @enum {string}
+             */
+            property_type: "retail" | "office" | "warehouse" | "land";
+            /** City */
+            city: string;
+            /** Districts */
+            districts: string[];
+            /** Min Area M2 */
+            min_area_m2: number;
+            /** Max Area M2 */
+            max_area_m2: number;
+            /** Max Monthly Budget */
+            max_monthly_budget: number;
+            /** Required Features */
+            required_features: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "searching" | "proposal" | "won" | "lost";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** RouteSolution */
+        RouteSolution: {
+            /**
+             * Algorithm
+             * @enum {string}
+             */
+            algorithm: "bfs" | "astar";
+            /** Property Ids */
+            property_ids: string[];
+            /** Distance Km */
+            distance_km: number;
+            /** Legs Km */
+            legs_km: number[];
+            /** Nodes Expanded */
+            nodes_expanded: number;
         };
         /** TokenResponse */
         TokenResponse: {
@@ -280,6 +960,23 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VisitRouteRequest */
+        VisitRouteRequest: {
+            start: components["schemas"]["GeoPoint"];
+            /** Property Ids */
+            property_ids: string[];
+        };
+        /** VisitRouteResponse */
+        VisitRouteResponse: {
+            /** Stops */
+            stops: components["schemas"]["PropertyResponse"][];
+            bfs: components["schemas"]["RouteSolution"];
+            astar: components["schemas"]["RouteSolution"];
+            /** Same Optimum */
+            same_optimum: boolean;
+            /** Node Reduction Pct */
+            node_reduction_pct: number;
         };
     };
     responses: never;
@@ -359,6 +1056,79 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CurrentUserResponse"];
+                };
+            };
+        };
+    };
+    put_company_assignment_api_v1_companies__company_id__assignment_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyAssignment"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyAssignmentReceipt"];
+                };
+            };
+            /** @description company not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description assigned advisor must be an active advisor */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_companies_api_v1_companies_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -480,6 +1250,505 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    get_owners_api_v1_owners_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerListResponse"];
+                };
+            };
+        };
+    };
+    post_owner_api_v1_owners_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OwnerCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_properties_api_v1_properties_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                q?: string | null;
+                city?: string | null;
+                property_type?: ("retail" | "office" | "warehouse" | "land") | null;
+                status?: ("available" | "reserved" | "rented") | null;
+                strategic_stock?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_property_api_v1_properties_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PropertyCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyResponse"];
+                };
+            };
+            /** @description invalid reference or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_property_api_v1_properties__property_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                property_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_requirements_api_v1_requirements_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                status?: ("open" | "searching" | "proposal" | "won" | "lost") | null;
+                company_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequirementListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_requirement_api_v1_requirements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequirementCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequirementResponse"];
+                };
+            };
+            /** @description invalid reference or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_requirement_api_v1_requirements__requirement_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requirement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequirementResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_matches_api_v1_requirements__requirement_id__matches_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requirement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_matches_api_v1_requirements__requirement_id__matches_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requirement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_decision_api_v1_requirements__requirement_id__candidates__candidate_id__decision_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requirement_id: string;
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CandidateDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_proposal_api_v1_requirements__requirement_id__proposal_optimize_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requirement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description invalid reference or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    post_visit_route_api_v1_routes_visits_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisitRouteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitRouteResponse"];
+                };
+            };
+            /** @description invalid reference or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_evidence_api_v1_ml_evidence_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceResponse"];
+                };
+            };
+        };
+    };
+    post_model_api_v1_ml_models_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelResponse"];
+                };
+            };
+            /** @description insufficient labelled evidence */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
