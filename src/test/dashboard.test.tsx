@@ -22,6 +22,12 @@ function renderDashboard(currentUser?: typeof user) {
           element={<h1>Destino nueva empresa</h1>}
         />
         <Route path="/contactos" element={<h1>Destino contactos</h1>} />
+        <Route path="/inmuebles" element={<h1>Destino inmuebles</h1>} />
+        <Route
+          path="/requerimientos"
+          element={<h1>Destino requerimientos</h1>}
+        />
+        <Route path="/aprendizaje" element={<h1>Destino aprendizaje</h1>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -40,6 +46,7 @@ describe("Inicio", () => {
       "Consulta por ID",
       "Tu sesión",
       "Acciones rápidas",
+      "Gestión inmobiliaria",
       "Cómo trabajar con SUPRA",
     ]) {
       expect(
@@ -55,13 +62,16 @@ describe("Inicio", () => {
       /Andrea|prioridades|visitas|pipeline|oportunidades|propuestas|\b18\b|\b36\b/,
     );
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(3);
+    expect(screen.getAllByRole("link")).toHaveLength(6);
   });
 
   it.each([
     ["Nueva empresa", "/empresas/nueva", "Destino nueva empresa"],
     ["Ir a Empresas", "/empresas", "Destino empresas"],
     ["Contactos por empresa", "/contactos", "Destino contactos"],
+    ["Ir a Inmuebles", "/inmuebles", "Destino inmuebles"],
+    ["Ir a Requerimientos", "/requerimientos", "Destino requerimientos"],
+    ["Ir a Aprendizaje", "/aprendizaje", "Destino aprendizaje"],
   ])("navega desde %s a %s", (name, target, heading) => {
     renderDashboard();
     const link = screen.getByRole("link", { name });

@@ -12,6 +12,10 @@ import { NewCompanyPage } from "../companies/NewCompanyPage";
 import { Shell } from "../../layout/Shell";
 import { ContactsHome } from "../contacts/ContactsHome";
 import { Dashboard } from "../home/Dashboard";
+import { PropertiesPage } from "../inventory/PropertiesPage";
+import { LearningPage } from "../learning/LearningPage";
+import { RequirementDetailPage } from "../requirements/RequirementDetailPage";
+import { RequirementsPage } from "../requirements/RequirementsPage";
 
 type Credentials = { email: string; password: string };
 const userKey = ["current-user"];
@@ -51,6 +55,16 @@ export function AuthenticatedApp() {
         <Route path="/empresas" element={<CompaniesHome />} />
         <Route path="/empresas/nueva" element={<NewCompanyPage />} />
         <Route path="/empresas/:companyId" element={<CompanyDetailPage />} />
+        <Route path="/inmuebles" element={<PropertiesPage />} />
+        <Route path="/requerimientos" element={<RequirementsPage />} />
+        <Route
+          path="/requerimientos/:requirementId"
+          element={<RequirementDetailPage />}
+        />
+        <Route
+          path="/aprendizaje"
+          element={<LearningPage user={user.data} />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Shell>

@@ -20,6 +20,24 @@ const capabilities = [
   },
 ];
 
+const realEstateModules = [
+  {
+    to: "/inmuebles",
+    title: "Inmuebles",
+    text: "Filtra locales, oficinas y almacenes por zona, estado y stock.",
+  },
+  {
+    to: "/requerimientos",
+    title: "Requerimientos",
+    text: "Registra lo que necesita una empresa y ordena sus candidatos.",
+  },
+  {
+    to: "/aprendizaje",
+    title: "Aprendizaje",
+    text: "Revisa la evidencia y las métricas del modelo de recomendación.",
+  },
+];
+
 function Icon({ path }: { path: string }) {
   return (
     <svg
@@ -110,6 +128,27 @@ export function Dashboard({ user }: Props) {
             </span>
             <Icon path="M5 12h14M13 6l6 6-6 6" />
           </Link>
+        </section>
+        <section
+          className="dashboard-panel"
+          aria-labelledby="dashboard-real-estate"
+        >
+          <h2 id="dashboard-real-estate">Gestión inmobiliaria</h2>
+          <p>Del requerimiento al inmueble recomendado.</p>
+          {realEstateModules.map(({ to, title, text }) => (
+            <Link
+              key={to}
+              className="dashboard-quick-action"
+              to={to}
+              aria-label={`Ir a ${title}`}
+            >
+              <span>
+                <strong>{title}</strong>
+                <small>{text}</small>
+              </span>
+              <Icon path="M5 12h14M13 6l6 6-6 6" />
+            </Link>
+          ))}
         </section>
         <section
           className="dashboard-panel"

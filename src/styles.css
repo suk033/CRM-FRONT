@@ -989,3 +989,269 @@ h2 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Real-estate modules: inventory, requirements and learning. */
+.module-page {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 72rem;
+}
+.module-card {
+  max-width: none;
+}
+.module-card h3 {
+  color: var(--color-heading);
+  font-size: 1.0625rem;
+  margin: var(--space-xs) 0 0;
+}
+.filter-form {
+  align-items: end;
+  display: grid;
+  gap: var(--space-xs) var(--space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  margin-top: var(--space-sm);
+}
+.field-group {
+  display: grid;
+  gap: var(--space-2xs);
+}
+.form-span {
+  grid-column: 1 / -1;
+}
+.filter-form input,
+.filter-form select,
+.lookup-form select,
+.candidate-item .lookup-form input {
+  appearance: none;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  color: var(--color-heading);
+  font: inherit;
+  min-height: 3rem;
+  padding: 0.75rem 0.875rem;
+  width: 100%;
+}
+.filter-form input:focus-visible,
+.filter-form select:focus-visible,
+.candidate-item input:focus-visible,
+.choice-list input:focus-visible,
+.candidate-breakdown summary:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.data-table {
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  width: 100%;
+}
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.data-table thead th {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.data-table small {
+  color: var(--color-muted);
+  display: block;
+}
+.compact-table th,
+.compact-table td {
+  padding: 0.375rem 0.5rem;
+}
+.badge {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-heading);
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0.125rem 0.625rem;
+  white-space: nowrap;
+}
+.badge-available,
+.badge-accepted {
+  background: #ecfdf3;
+  border-color: #abefc6;
+  color: #067647;
+}
+.badge-reserved,
+.badge-shortlisted {
+  background: #fffaeb;
+  border-color: #fedf89;
+  color: #b54708;
+}
+.badge-rented,
+.badge-rejected {
+  background: var(--color-danger-surface);
+  border-color: #fecdca;
+  color: var(--color-danger);
+}
+.badge-strategic {
+  background: #eff8ff;
+  border-color: #b2ddff;
+  color: #175cd3;
+}
+.candidate-list {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.candidate-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-sm);
+}
+.candidate-header {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  justify-content: space-between;
+}
+.candidate-header h3 {
+  margin: 0;
+}
+.score-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.score-bar,
+.coefficient-track {
+  background: var(--color-surface-strong);
+  border-radius: 999px;
+  display: block;
+  height: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+.score-bar span {
+  background: var(--color-accent);
+  display: block;
+  height: 100%;
+}
+.candidate-breakdown summary {
+  color: var(--color-accent-text);
+  cursor: pointer;
+  font-weight: 700;
+}
+.candidate-breakdown[open] {
+  display: grid;
+  gap: var(--space-xs);
+}
+.metric-tiles {
+  display: grid;
+  gap: var(--space-xs);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  margin: var(--space-sm) 0 0;
+}
+.metric-tiles div {
+  background: var(--color-surface-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs);
+}
+.metric-tiles dt {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+.metric-tiles dd {
+  color: var(--color-heading);
+  font-size: 1.375rem;
+  font-weight: 800;
+  margin: 0;
+}
+.result-panel {
+  display: grid;
+  gap: var(--space-xs);
+}
+.route-grid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+.route-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-sm);
+}
+.route-card ol {
+  margin: var(--space-xs) 0 0;
+  padding-left: 1.25rem;
+}
+.choice-list {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: var(--space-xs) var(--space-sm);
+}
+.choice-list label {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+.coefficient-list {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.coefficient-list li {
+  align-items: center;
+  display: grid;
+  gap: var(--space-xs);
+  grid-template-columns: minmax(8rem, 12rem) 1fr 4rem;
+}
+.coefficient-track {
+  height: 0.75rem;
+}
+.coefficient-track::after {
+  background: var(--color-muted);
+  content: "";
+  height: 100%;
+  left: 50%;
+  position: absolute;
+  width: 1px;
+}
+.coefficient-bar {
+  height: 100%;
+  position: absolute;
+}
+.coefficient-bar.positive {
+  background: var(--color-accent);
+}
+.coefficient-bar.negative {
+  background: var(--color-danger);
+}
+.coefficient-value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.confusion-table {
+  max-width: 32rem;
+}
+.confusion-table caption {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  padding-bottom: 0.375rem;
+  text-align: left;
+}

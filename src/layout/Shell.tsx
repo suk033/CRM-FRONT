@@ -39,6 +39,14 @@ function NavIcon({ path }: { path: string }) {
   );
 }
 
+const contexts = [
+  ["/empresas", "Empresas"],
+  ["/contactos", "Contactos"],
+  ["/inmuebles", "Inmuebles"],
+  ["/requerimientos", "Requerimientos"],
+  ["/aprendizaje", "Aprendizaje"],
+] as const;
+
 export function Shell({ user, onLogout, children }: Props) {
   const { pathname } = useLocation();
   const desktop = useSyncExternalStore(
@@ -57,11 +65,8 @@ export function Shell({ user, onLogout, children }: Props) {
     if (!desktop) toggle.current?.focus();
   };
   const role = user?.role === "admin" ? "Administrador" : "Asesor";
-  const context = pathname.startsWith("/empresas")
-    ? "Empresas"
-    : pathname.startsWith("/contactos")
-      ? "Contactos"
-      : "Inicio";
+  const context =
+    contexts.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? "Inicio";
   return (
     <div
       className="app-shell"
@@ -128,11 +133,23 @@ export function Shell({ user, onLogout, children }: Props) {
           <NavIcon path="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M20 21v-2a4 4 0 0 0-3-4M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM17 3a4 4 0 0 1 0 8" />
           Contactos
         </NavLink>
+        <NavLink to="/inmuebles" onClick={closeMenu}>
+          <NavIcon path="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />
+          Inmuebles
+        </NavLink>
+        <NavLink to="/requerimientos" onClick={closeMenu}>
+          <NavIcon path="M9 3h6v3H9ZM7 5H5v16h14V5h-2M9 12h6M9 16h4" />
+          Requerimientos
+        </NavLink>
+        <NavLink to="/aprendizaje" onClick={closeMenu}>
+          <NavIcon path="M12 3 2 8l10 5 10-5ZM6 10v5c3 3 9 3 12 0v-5" />
+          Aprendizaje
+        </NavLink>
         <button disabled>
           <NavIcon path="M4 3h16v18H4ZM8 16v-4M12 16V8M16 16v-6" />
           <span>Reportes · Próximamente</span>
         </button>
-        <p className="shell-nav-footer">Gestión de empresas y contactos</p>
+        <p className="shell-nav-footer">Empresas, inmuebles y requerimientos</p>
       </nav>
       <main className="shell-main">{children}</main>
     </div>

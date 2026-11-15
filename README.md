@@ -2,6 +2,13 @@
 
 La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio de sesión en español, shell protegido, visualización del usuario actual, solicitudes Bearer y limpieza de sesión ante logout o respuestas 401. Los flujos de empresas y contactos quedan intencionalmente pendientes. `Prototipo/` contiene referencias de diseño y no forma parte de la aplicación ejecutable.
 
+## Módulos inmobiliarios (Fase 3)
+
+- `/inmuebles`: inventario paginado con filtros por texto, ciudad, tipo, estado y stock estratégico.
+- `/requerimientos`: listado y alta de requerimientos por empresa.
+- `/requerimientos/:id`: ranking de candidatos por reglas (y probabilidad del modelo cuando existe), desglose por criterio, decisiones (preseleccionar, aceptar, rechazar con motivo), propuesta optimizada con Hill Climbing y ruta de visitas BFS vs A*.
+- `/aprendizaje`: evidencia de decisiones, métricas del modelo de regresión logística frente a la línea base de reglas, matriz de confusión, validación cruzada, coeficientes y entrenamiento (solo administradores).
+
 ## Inicio
 
 1. Copiá `env.example` como `.env.local`.
