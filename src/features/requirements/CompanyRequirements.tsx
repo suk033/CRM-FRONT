@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import type { components } from "../../api/schema";
 import { EmptyState, Pill, type Tone } from "../../components/ui";
+import { Select } from "../../components/Select";
 import {
   call,
   formatArea,
@@ -194,18 +195,16 @@ export function RequirementCreateForm({ companyId }: { companyId: string }) {
         <label className="form-field" htmlFor="requirement-type">
           Tipo de inmueble
         </label>
-        <select
+        <Select
           id="requirement-type"
           name="property_type"
           defaultValue="retail"
           disabled={create.isPending}
-        >
-          {Object.entries(propertyTypeLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+          options={Object.entries(propertyTypeLabels).map(([value, label]) => ({
+            value,
+            label,
+          }))}
+        />
       </div>
       {field("requirement-city", "Ciudad", "city")}
       {field(

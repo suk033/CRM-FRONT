@@ -84,6 +84,7 @@ export function AuthenticatedApp() {
 export function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
   const login = useMutation({
     mutationFn: async (credentials: Credentials) => {
       const { data, response } = await api.POST("/api/v1/auth/login", {
@@ -131,13 +132,19 @@ export function Login() {
             if (login.isPending) return;
             setError(false);
             const form = new FormData(event.currentTarget);
-            login.mutate({
-              email: String(form.get("email")),
-              password: String(form.get("password")),
-            });
+            const email = String(form.get("email") ?? "").trim();
+            const password = String(form.get("password") ?? "");
+            const missing = {
+              email: email ? "" : "Ingresa tu correo electrónico.",
+              password: password ? "" : "Ingresa tu contraseña.",
+            };
+            setFieldErrors(missing);
+            if (missing.email || missing.password) return;
+            login.mutate({ email, password });
           }}
           aria-labelledby="login-title"
           aria-busy={login.isPending}
+          noValidate
         >
           <p className="eyebrow">ACCESO A TU ESPACIO</p>
           <h1 id="login-title">Iniciar sesión</h1>
@@ -155,7 +162,11 @@ export function Login() {
             autoComplete="email"
             required
             disabled={login.isPending}
+            aria-invalid={Boolean(fieldErrors.email) || undefined}
           />
+          {fieldErrors.email && (
+            <span className="ws-field-error">{fieldErrors.email}</span>
+          )}
           <label className="form-field" htmlFor="login-password">
             Contraseña
           </label>
@@ -167,7 +178,11 @@ export function Login() {
             required
             disabled={login.isPending}
             aria-describedby="login-password-help"
+            aria-invalid={Boolean(fieldErrors.password) || undefined}
           />
+          {fieldErrors.password && (
+            <span className="ws-field-error">{fieldErrors.password}</span>
+          )}
           <p id="login-password-help" className="login-help">
             Puedes pegar tu contraseña o usar tu gestor.
           </p>

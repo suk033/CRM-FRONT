@@ -25,6 +25,7 @@ import {
   type CurrentUser,
 } from "../home/workspaceData";
 import "./profile.css";
+import { Select } from "../../components/Select";
 
 type Section = "resumen" | "rendimiento" | "equipo" | "modelo";
 
@@ -51,10 +52,7 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         { id: "equipo", label: "Actividades del equipo" },
         { id: "modelo", label: "Modelo ML" },
       ]
-    : [
-        { id: "resumen", label: "Mi resumen" },
-        { id: "modelo", label: "Modelo ML" },
-      ];
+    : [{ id: "resumen", label: "Mi resumen" }];
   const requested = params.get("seccion");
   const active = tabs.find((tab) => tab.id === requested)?.id ?? tabs[0].id;
   const select = (id: Section) =>
@@ -75,7 +73,7 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         description={
           isAdmin
             ? "Tu cuenta, el rendimiento del equipo y el modelo de recomendación."
-            : "Tu cuenta, tu avance y el modelo de recomendación."
+            : "Tu cuenta y tu avance con tus empresas."
         }
       />
       <Panel title="Tu cuenta">
@@ -106,14 +104,16 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         </div>
       </Panel>
 
-      <Tabs
-        label="Secciones del perfil"
-        tabs={tabs}
-        active={active}
-        onChange={select}
-      />
+      {tabs.length > 1 && (
+        <Tabs
+          label="Secciones del perfil"
+          tabs={tabs}
+          active={active}
+          onChange={select}
+        />
+      )}
       <div
-        role="tabpanel"
+        role={tabs.length > 1 ? "tabpanel" : undefined}
         aria-label={tabs.find((t) => t.id === active)?.label}
       >
         {active === "resumen" && <MySummary />}
@@ -334,33 +334,25 @@ function TeamActivities() {
       <div className="profile-filters">
         <label>
           Estado
-          <select
+          <Select
             value={status}
-            onChange={(event) => setStatus(event.target.value as StatusFilter)}
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setStatus(value as StatusFilter)}
+            options={statusOptions}
+          />
         </label>
         <label>
           Asesor
-          <select
+          <Select
             value={owner}
-            onChange={(event) => setOwner(event.target.value)}
-          >
-            <option value="">Todos los asesores</option>
-            {(owner && !owners.includes(owner)
-              ? [owner, ...owners]
-              : owners
-            ).map((email) => (
-              <option key={email} value={email}>
-                {email}
-              </option>
-            ))}
-          </select>
+            onChange={setOwner}
+            options={[
+              { value: "", label: "Todos los asesores" },
+              ...(owner && !owners.includes(owner)
+                ? [owner, ...owners]
+                : owners
+              ).map((email) => ({ value: email, label: email })),
+            ]}
+          />
         </label>
       </div>
       {activities.isLoading && <p role="status">Cargando actividades…</p>}

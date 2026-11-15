@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { requestMessage } from "./labels";
+import { useToast } from "../../components/Feedback";
 
 const TEMPLATE_NAME = "plantilla_locales_supra.csv";
 const TEMPLATE = [
@@ -55,6 +56,7 @@ function plural(count: number, singular: string, pluralForm: string) {
 
 export function PropertyImport() {
   const queryClient = useQueryClient();
+  const { notify } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const importFile = useMutation<ImportResult, ImportFailure, File>({
     mutationFn: async (selected) => {
@@ -80,8 +82,10 @@ export function PropertyImport() {
       }
       return result.data;
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["properties"] }),
+    onSuccess: (result) => {
+      notify(`Se importaron ${result.created} inmuebles correctamente.`);
+      return queryClient.invalidateQueries({ queryKey: ["properties"] });
+    },
   });
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -90,29 +94,42 @@ export function PropertyImport() {
   }
 
   return (
-    <section
-      className="workspace-card feature-card module-card"
-      aria-labelledby="property-import-title"
-    >
-      <h2 id="property-import-title">Importar locales</h2>
-      <p>
+    <section className="ws-panel" aria-labelledby="property-import-title">
+      <div className="ws-panel-header">
+        <h2 id="property-import-title">Importar locales</h2>
+        <a
+          className="secondary-action ws-button-link"
+          href={templateHref}
+          download={TEMPLATE_NAME}
+        >
+          Descargar plantilla CSV
+        </a>
+      </div>
+      <p className="ws-muted">
         Completa la plantilla en Excel (separada por punto y coma) y súbela. Si
         una fila tiene errores no se importa nada y te indicamos qué corregir.
       </p>
-      <form className="filter-form" onSubmit={submit}>
-        <div className="field-group">
-          <label className="form-field" htmlFor="property-import-file">
-            Archivo CSV de locales
+      <form className="ws-import-form" onSubmit={submit}>
+        <div className="ws-field">
+          <label htmlFor="property-import-file">Archivo CSV de locales</label>
+          <label className="ws-file">
+            <input
+              id="property-import-file"
+              className="ws-visually-hidden"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(event) => {
+                setFile(event.currentTarget.files?.[0] ?? null);
+                importFile.reset();
+              }}
+            />
+            <span className="ws-file-button" aria-hidden="true">
+              Seleccionar archivo
+            </span>
+            <span className="ws-file-name" aria-hidden="true">
+              {file ? file.name : "Ningún archivo seleccionado"}
+            </span>
           </label>
-          <input
-            id="property-import-file"
-            type="file"
-            accept=".csv,text/csv"
-            onChange={(event) => {
-              setFile(event.currentTarget.files?.[0] ?? null);
-              importFile.reset();
-            }}
-          />
         </div>
         <button
           className="primary-action"
@@ -121,13 +138,6 @@ export function PropertyImport() {
         >
           {importFile.isPending ? "Importando…" : "Importar locales"}
         </button>
-        <a
-          className="secondary-action"
-          href={templateHref}
-          download={TEMPLATE_NAME}
-        >
-          Descargar plantilla CSV
-        </a>
       </form>
       {importFile.isSuccess && (
         <p role="status">

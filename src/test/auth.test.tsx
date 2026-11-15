@@ -179,7 +179,12 @@ describe("autenticación", () => {
       screen.getByText(/accede a tu espacio de trabajo/i),
     ).toBeInTheDocument();
     expect(document.documentElement.innerHTML).not.toContain("token-secreto");
-    expect(sessionStorage.length + localStorage.length).toBe(0);
+    // Only the light/dark preference may be stored; never the access token.
+    const stored = [
+      ...Object.keys(sessionStorage),
+      ...Object.keys(localStorage),
+    ].filter((key) => key !== "supra-theme");
+    expect(stored).toEqual([]);
   });
 
   it("limpia autenticación y caché ante 401 de usuario actual", async () => {
