@@ -54,8 +54,8 @@
 }
 .ws-select-button:focus-visible,
 .ws-select.is-open .ws-select-button {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgb(195 24 32 / 0.15);
+  border-color: var(--focus-ring, #323952);
+  box-shadow: 0 0 0 3px var(--focus-ring-soft, rgb(50 57 82 / 0.18));
   outline: none;
 }
 .ws-select-button:disabled {
@@ -447,4 +447,39 @@
 .app-shell .shell-nav a[aria-current="page"]:hover {
   background: var(--color-accent-hover);
   color: #fff;
+}
+
+/* nav hover keeps readable text in every theme */
+.app-shell .shell-nav a:hover:not([aria-current="page"]) {
+  color: var(--on-glass);
+}
+
+/* soft brand focus ring for text fields (no thick outline that looks like an error) */
+.app-shell input:not([type="checkbox"]):not([type="file"]):focus-visible,
+.app-shell textarea:focus-visible,
+.login-page input:focus-visible {
+  border-color: var(--focus-ring, #323952);
+  box-shadow: 0 0 0 3px var(--focus-ring-soft, rgb(50 57 82 / 0.18));
+  outline: none;
+}
+/* Focus uses the brand slate; red is reserved for errors and primary actions. */
+.app-shell,
+.login-page {
+  --focus-ring: #323952;
+  --focus-ring-soft: rgb(50 57 82 / 0.18);
+  --focus-outline: 0.1875rem solid #323952;
+}
+:root[data-theme="dark"] .app-shell {
+  --focus-ring: #a9b0c6;
+  --focus-ring-soft: rgb(169 176 198 / 0.25);
+  --focus-outline: 0.1875rem solid #a9b0c6;
+}
+.ws-file:hover,
+.ws-file:focus-within {
+  border-color: var(--focus-ring);
+}
+.app-shell .secondary-action:disabled,
+.app-shell .primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
