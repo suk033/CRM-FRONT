@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { App } from "../App";
+import { App, queryClient } from "../App";
 import { getAccessToken, setAccessToken } from "../api/client";
 
 const api = "http://localhost:8000/api/v1";
@@ -52,6 +52,74 @@ async function login() {
 }
 
 describe("autenticación", () => {
+  it("presenta marca honesta sin navegación privada y campos vacíos accesibles", () => {
+    render(<App />);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Iniciar sesión",
+    );
+    expect(
+      screen.getByText("Empresas y contactos, en un solo lugar."),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/acceso por roles/i)).toBeInTheDocument();
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    const email = screen.getByLabelText(/correo/i);
+    const password = screen.getByLabelText(/contraseña/i);
+    expect(email).toHaveValue("");
+    expect(email).toHaveAttribute("name", "email");
+    expect(email).toHaveAttribute("autocomplete", "email");
+    expect(password).toHaveValue("");
+    expect(password).toHaveAttribute("name", "password");
+    expect(password).toHaveAttribute("type", "password");
+    expect(password).toHaveAttribute("autocomplete", "current-password");
+  });
+
+  it("anuncia espera, bloquea envíos duplicados y permite reintentar tras error", async () => {
+    let release!: () => void;
+    let requests = 0;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.post(`${api}/auth/login`, async () => {
+        requests += 1;
+        await pending;
+        return new HttpResponse(null, { status: 401 });
+      }),
+    );
+    render(<App />);
+    const email = screen.getByLabelText(/correo/i);
+    const password = screen.getByLabelText(/contraseña/i);
+    const form = screen.getByRole("form", { name: /iniciar sesión/i });
+    fireEvent.change(email, { target: { value: "ana@supra.test" } });
+    fireEvent.change(password, { target: { value: "clave-secreta" } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(requests).toBe(1));
+    expect(screen.getByRole("button", { name: /ingresando/i })).toBeDisabled();
+    expect(email).toBeDisabled();
+    expect(password).toBeDisabled();
+    expect(form).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByRole("status")).toHaveTextContent(/verificando/i);
+    fireEvent.submit(form);
+    release();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /no fue posible/i,
+    );
+    expect(requests).toBe(1);
+    expect(form).toHaveAttribute("aria-busy", "false");
+    expect(screen.getByRole("button", { name: "Ingresar" })).toBeEnabled();
+    expect(email).toHaveValue("ana@supra.test");
+    expect(password).toHaveValue("clave-secreta");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    fireEvent.submit(form);
+    await waitFor(() => expect(requests).toBe(2));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /no fue posible/i,
+    );
+  });
+
   it("envía el JSON exacto, adjunta Bearer y muestra el usuario", async () => {
     await login();
     expect(await seen[0].json()).toEqual({
@@ -88,11 +156,14 @@ describe("autenticación", () => {
     );
   });
 
-  it("redirige rutas protegidas y no persiste el token", async () => {
+  it("redirige rutas protegidas y presenta una explicación útil sin persistir token", async () => {
     window.history.replaceState({}, "", "/empresas");
     render(<App />);
     expect(
       await screen.findByRole("heading", { name: /iniciar sesión/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/accede a tu espacio de trabajo/i),
     ).toBeInTheDocument();
     expect(document.documentElement.innerHTML).not.toContain("token-secreto");
     expect(sessionStorage.length + localStorage.length).toBe(0);
@@ -116,13 +187,25 @@ describe("autenticación", () => {
     await waitFor(() => expect(getAccessToken()).toBeNull());
   });
 
-  it("al salir limpia el token y la consulta de usuario", async () => {
+  it("al salir limpia el token, usuario y credenciales del caché de mutaciones", async () => {
     await login();
+    expect(
+      queryClient
+        .getMutationCache()
+        .getAll()
+        .some(
+          (mutation) =>
+            (mutation.state.variables as { password?: string } | undefined)
+              ?.password === "clave-secreta",
+        ),
+    ).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
     expect(
       await screen.findByRole("heading", { name: /iniciar sesión/i }),
     ).toBeInTheDocument();
     expect(getAccessToken()).toBeNull();
+    expect(queryClient.getQueryData(["current-user"])).toBeUndefined();
+    expect(queryClient.getMutationCache().getAll()).toEqual([]);
   });
 
   it("expone una shell semántica con futuros módulos deshabilitados", async () => {
