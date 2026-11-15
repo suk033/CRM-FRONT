@@ -4,7 +4,7 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 
 ## Módulos inmobiliarios (Fase 3)
 
-- `/inmuebles`: inventario paginado con filtros por texto, ciudad, tipo, estado y stock estratégico.
+- `/inmuebles`: inventario paginado con filtros por texto, ciudad, tipo, estado y stock estratégico. Incluye la importación de locales desde la plantilla CSV (`Descargar plantilla CSV`): si una fila es inválida no se importa nada y se muestran los errores por fila.
 - `/requerimientos`: listado y alta de requerimientos por empresa.
 - `/requerimientos/:id`: ranking de candidatos por reglas (y probabilidad del modelo cuando existe), desglose por criterio, decisiones (preseleccionar, aceptar, rechazar con motivo), propuesta optimizada con Hill Climbing y ruta de visitas BFS vs A*.
 - `/aprendizaje`: evidencia de decisiones, métricas del modelo de regresión logística frente a la línea base de reglas, matriz de confusión, validación cruzada, coeficientes y entrenamiento (solo administradores).

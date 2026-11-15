@@ -128,4 +128,81 @@ describe("inmuebles", () => {
       /no fue posible completar la solicitud/i,
     );
   });
+  it("importa locales desde la plantilla CSV y refresca el listado", async () => {
+    const bodies: unknown[] = [];
+    server.use(
+      http.post(`${api}/properties/import`, async ({ request }) => {
+        bodies.push(await request.json());
+        return HttpResponse.json(
+          {
+            created: 2,
+            owners_created: 1,
+            items: [property, { ...property, id: "p-2", code: "LOC-002" }],
+          },
+          { status: 201 },
+        );
+      }),
+    );
+    setAccessToken("token");
+    window.history.replaceState({}, "", "/inmuebles");
+    render(<App />);
+    await screen.findByText("LOC-001");
+
+    const template = screen.getByRole("link", {
+      name: "Descargar plantilla CSV",
+    });
+    expect(template).toHaveAttribute("download", "plantilla_locales_supra.csv");
+    expect(decodeURIComponent(template.getAttribute("href") ?? "")).toContain(
+      "titulo;tipo;ciudad;distrito",
+    );
+
+    const csv = "titulo;tipo\nLocal;local_comercial";
+    fireEvent.change(screen.getByLabelText("Archivo CSV de locales"), {
+      target: { files: [new File([csv], "locales.csv", { type: "text/csv" })] },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Importar locales" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Se importaron 2 inmuebles (LOC-001, LOC-002) y 1 propietario nuevo.",
+    );
+    expect(bodies).toEqual([{ content: csv }]);
+    await waitFor(() => expect(requests.length).toBeGreaterThanOrEqual(2));
+  });
+
+  it("muestra los errores por fila cuando el archivo es inválido", async () => {
+    server.use(
+      http.post(`${api}/properties/import`, () =>
+        HttpResponse.json(
+          {
+            detail: {
+              message: "invalid rows; nothing was imported",
+              errors: [
+                { row: 3, field: "tipo", message: "Input should be 'retail'" },
+                { row: 4, field: "ciudad", message: "Field required" },
+              ],
+            },
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+    setAccessToken("token");
+    window.history.replaceState({}, "", "/inmuebles");
+    render(<App />);
+    await screen.findByText("LOC-001");
+
+    const importButton = screen.getByRole("button", {
+      name: "Importar locales",
+    });
+    expect(importButton).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Archivo CSV de locales"), {
+      target: { files: [new File(["x"], "malo.csv", { type: "text/csv" })] },
+    });
+    fireEvent.click(importButton);
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("No se importó ningún inmueble.");
+    expect(alert).toHaveTextContent("Fila 3 · tipo: Input should be 'retail'");
+    expect(alert).toHaveTextContent("Fila 4 · ciudad: Field required");
+  });
 });

@@ -11,6 +11,7 @@ import {
   type PropertyStatus,
   type PropertyType,
 } from "./labels";
+import { PropertyImport } from "./PropertyImport";
 
 const pageSize = 10;
 
@@ -125,6 +126,8 @@ export function PropertiesPage() {
           </button>
         </form>
       </section>
+
+      <PropertyImport />
 
       <section
         className="workspace-card feature-card module-card"

@@ -169,6 +169,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/properties/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Property Import
+         * @description Import properties from the CSV template (';' or ',' separated). All rows are created or none.
+         */
+        post: operations["post_property_import_api_v1_properties_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/properties/{property_id}": {
         parameters: {
             query?: never;
@@ -718,6 +738,23 @@ export interface components {
             is_strategic_stock: boolean;
             /** Notes */
             notes?: string | null;
+        };
+        /** PropertyImportRequest */
+        PropertyImportRequest: {
+            /**
+             * Content
+             * @description CSV text using the property template columns
+             */
+            content: string;
+        };
+        /** PropertyImportResponse */
+        PropertyImportResponse: {
+            /** Created */
+            created: number;
+            /** Owners Created */
+            owners_created: number;
+            /** Items */
+            items: components["schemas"]["PropertyResponse"][];
         };
         /** PropertyListResponse */
         PropertyListResponse: {
@@ -1366,6 +1403,37 @@ export interface operations {
                 };
             };
             /** @description invalid reference or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    post_property_import_api_v1_properties_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PropertyImportRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyImportResponse"];
+                };
+            };
+            /** @description invalid file or rows; nothing imported */
             422: {
                 headers: {
                     [name: string]: unknown;
