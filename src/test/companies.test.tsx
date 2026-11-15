@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -29,8 +30,69 @@ const company = {
 let postBody: unknown;
 let companyPosts = 0;
 
+const overviewItem = (
+  id: string,
+  legal_name: string,
+  status: "active" | "inactive",
+  extra: Record<string, unknown> = {},
+) => ({
+  id,
+  legal_name,
+  trade_name: null,
+  tax_id: null,
+  assigned_advisor_id: null,
+  assigned_advisor_email: null,
+  status,
+  open_requirements: 0,
+  total_requirements: 0,
+  pending_activities: 0,
+  overdue_activities: 0,
+  last_activity_at: null,
+  next_activity_at: null,
+  ...extra,
+});
+const overview = {
+  items: [
+    overviewItem(company.id, company.legal_name, "active", {
+      trade_name: "SUPRA",
+      tax_id: "RFC123",
+      assigned_advisor_id: "1",
+      assigned_advisor_email: "ana@supra.test",
+      open_requirements: 2,
+      total_requirements: 3,
+      pending_activities: 4,
+      overdue_activities: 1,
+      next_activity_at: "2025-02-03T15:00:00Z",
+      last_activity_at: "2025-01-30T15:00:00Z",
+    }),
+    overviewItem(
+      "22222222-2222-2222-2222-222222222222",
+      "Retail Norte SAC",
+      "active",
+      {
+        tax_id: "20999888777",
+      },
+    ),
+    overviewItem(
+      "33333333-3333-3333-3333-333333333333",
+      "Dormida SRL",
+      "inactive",
+    ),
+  ],
+  total: 3,
+  active: 2,
+};
+const overviewHandler = http.get(`${api}/companies/overview`, () =>
+  HttpResponse.json(overview),
+);
+
 const server = setupServer(
   http.get(`${api}/users/me`, () => HttpResponse.json(user)),
+  overviewHandler,
+  http.get(`${api}/requirements`, () =>
+    HttpResponse.json({ items: [], page: 1, page_size: 100, total: 0 }),
+  ),
+  http.get(`${api}/activities`, () => HttpResponse.json({ items: [] })),
   http.post(`${api}/companies`, async ({ request }) => {
     companyPosts += 1;
     postBody = await request.json();
@@ -57,14 +119,14 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-function renderAuthenticated(path = "/empresas") {
+function renderAuthenticated(path = "/empresas/nueva") {
   setAccessToken("token-secreto");
   window.history.replaceState({}, "", path);
   render(<App />);
 }
 
 describe("empresas", () => {
-  it("crea una empresa con payload limpio y muestra el detalle real", async () => {
+  it("crea una empresa con payload limpio y muestra la ficha confirmada", async () => {
     renderAuthenticated();
 
     fireEvent.change(await screen.findByLabelText(/razón social/i), {
@@ -76,10 +138,10 @@ describe("empresas", () => {
     fireEvent.change(screen.getByLabelText(/identificación fiscal/i), {
       target: { value: "  RFC123  " },
     });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
 
     expect(
-      await screen.findByRole("heading", { name: "SUPRA Demo SA" }),
+      await screen.findByRole("heading", { name: "Nueva empresa y contacto" }),
     ).toBeInTheDocument();
     expect(postBody).toEqual({
       legal_name: "SUPRA Demo SA",
@@ -88,6 +150,11 @@ describe("empresas", () => {
     });
     expect(screen.getByText("RFC123")).toBeInTheDocument();
     expect(screen.getByText(/todavía no hay contactos/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("link", { name: "Ir a la ficha" }));
+    expect(
+      await screen.findByRole("heading", { name: "SUPRA Demo SA", level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("RUC: RFC123")).toBeInTheDocument();
   });
 
   it("consulta contactos reales del GET después de crear, sin sembrar detalle", async () => {
@@ -96,6 +163,7 @@ describe("empresas", () => {
       release = resolve;
     });
     server.use(
+      overviewHandler,
       http.get(`${api}/companies/:companyId`, async () => {
         await pending;
         return HttpResponse.json({
@@ -117,7 +185,7 @@ describe("empresas", () => {
     fireEvent.change(await screen.findByLabelText(/razón social/i), {
       target: { value: "Demo" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
     try {
       expect(
         await screen.findByRole("heading", { name: /cargando empresa/i }),
@@ -154,7 +222,7 @@ describe("empresas", () => {
     fireEvent.submit(form);
     await waitFor(() => expect(companyPosts).toBe(1));
     try {
-      expect(screen.getByRole("button", { name: /creando/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /guardando/i })).toBeDisabled();
       fireEvent.submit(form);
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
       expect(legal).toBeDisabled();
@@ -167,7 +235,7 @@ describe("empresas", () => {
     } finally {
       release();
     }
-    await screen.findByRole("heading", { name: "SUPRA Demo SA" });
+    await screen.findByRole("heading", { name: "Nueva empresa y contacto" });
     expect(companyPosts).toBe(1);
   });
 
@@ -176,8 +244,8 @@ describe("empresas", () => {
     fireEvent.change(await screen.findByLabelText(/razón social/i), {
       target: { value: company.legal_name },
     });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
-    await screen.findByRole("heading", { name: company.legal_name });
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
+    await screen.findByRole("heading", { name: "Nueva empresa y contacto" });
     expect(queryClient.getMutationCache().getAll()[0].state.variables).toEqual({
       legal_name: company.legal_name,
       trade_name: null,
@@ -205,6 +273,7 @@ describe("empresas", () => {
           await pending;
           return HttpResponse.json(company, { status: 201 });
         }),
+        overviewHandler,
         http.get(`${api}/companies/:companyId`, () => {
           detailGets += 1;
           return HttpResponse.json({ ...company, contacts: [] });
@@ -222,7 +291,7 @@ describe("empresas", () => {
       fireEvent.change(await screen.findByLabelText(/razón social/i), {
         target: { value: company.legal_name },
       });
-      fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+      fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
       await waitFor(() => expect(companyPosts).toBe(1));
       const mutation = queryClient.getMutationCache().getAll()[0];
       try {
@@ -265,6 +334,7 @@ describe("empresas", () => {
 
   it("deshabilita reintentar mientras la consulta está pendiente", async () => {
     server.use(
+      overviewHandler,
       http.get(
         `${api}/companies/:companyId`,
         () => new HttpResponse(null, { status: 404 }),
@@ -278,6 +348,7 @@ describe("empresas", () => {
     });
     let gets = 0;
     server.use(
+      overviewHandler,
       http.get(`${api}/companies/:companyId`, async () => {
         gets += 1;
         await pending;
@@ -328,13 +399,15 @@ describe("empresas", () => {
             ),
       );
       renderAuthenticated(
-        method === "POST" ? "/empresas" : "/empresas/unauthorized",
+        method === "POST" ? "/empresas/nueva" : "/empresas/unauthorized",
       );
       if (method === "POST") {
         fireEvent.change(await screen.findByLabelText(/razón social/i), {
           target: { value: "Demo" },
         });
-        fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+        fireEvent.click(
+          screen.getByRole("button", { name: /guardar empresa/i }),
+        );
       }
       await screen.findByRole("heading", { name: /iniciar sesión/i });
       expect(getAccessToken()).toBeNull();
@@ -347,13 +420,13 @@ describe("empresas", () => {
     renderAuthenticated();
     const legal = await screen.findByLabelText(/razón social/i);
     fireEvent.change(legal, { target: { value: "Demo" } });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/conexión/i);
     expect(legal).toHaveValue("Demo");
     expect(screen.queryByText(/failed to fetch/i)).not.toBeInTheDocument();
     server.resetHandlers();
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
-    await screen.findByRole("heading", { name: company.legal_name });
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
+    await screen.findByRole("heading", { name: "Nueva empresa y contacto" });
   });
 
   it("valida razón social en blanco antes de enviar", async () => {
@@ -362,25 +435,62 @@ describe("empresas", () => {
     fireEvent.change(await screen.findByLabelText(/razón social/i), {
       target: { value: "   " },
     });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/razón social/i);
     expect(companyPosts).toBe(0);
   });
 
-  it("permite consultar por ID cuando no existe listado", async () => {
-    renderAuthenticated();
-
-    fireEvent.change(await screen.findByLabelText(/id de empresa/i), {
-      target: { value: "22222222-2222-2222-2222-222222222222" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /ver detalle/i }));
-
+  it("lista empresas activas por defecto con conteos, filtros y búsqueda", async () => {
+    renderAuthenticated("/empresas");
+    const table = await screen.findByRole("table", { name: "Empresas" });
+    const rows = () => within(table).getAllByRole("row").slice(1);
+    expect(rows()).toHaveLength(2);
     expect(
-      await screen.findByRole("heading", { name: "SUPRA Demo SA" }),
+      screen.getByRole("button", { name: /^Activas\s*2$/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: /^Inactivas\s*1$/ }),
     ).toBeInTheDocument();
-    expect(window.location.pathname).toBe(
-      "/empresas/22222222-2222-2222-2222-222222222222",
+    expect(
+      screen.getByRole("button", { name: /^Todas\s*3$/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Dormida SRL")).not.toBeInTheDocument();
+
+    const supra = rows()[0];
+    expect(within(supra).getByRole("link", { name: "SUPRA" })).toHaveAttribute(
+      "href",
+      `/empresas/${company.id}`,
+    );
+    expect(supra).toHaveTextContent("RUC: RFC123");
+    expect(supra).toHaveTextContent("Activa");
+    expect(supra).toHaveTextContent("ana@supra.test");
+    expect(within(supra).getByText("1 vencida")).toHaveClass("ws-tone-danger");
+    expect(rows()[1]).toHaveTextContent("Sin asignar");
+
+    fireEvent.click(screen.getByRole("button", { name: /^Inactivas/ }));
+    expect(rows()).toHaveLength(1);
+    expect(rows()[0]).toHaveTextContent("Dormida SRL");
+    expect(rows()[0]).toHaveTextContent("Inactiva");
+
+    fireEvent.click(screen.getByRole("button", { name: /^Todas/ }));
+    fireEvent.change(screen.getByLabelText(/buscar empresa/i), {
+      target: { value: "20999888" },
+    });
+    expect(rows()).toHaveLength(1);
+    expect(rows()[0]).toHaveTextContent("Retail Norte SAC");
+    fireEvent.change(screen.getByLabelText(/buscar empresa/i), {
+      target: { value: "retail norte" },
+    });
+    expect(rows()).toHaveLength(1);
+    fireEvent.change(screen.getByLabelText(/buscar empresa/i), {
+      target: { value: "no existe" },
+    });
+    expect(screen.getByText(/ninguna empresa coincide/i)).toBeInTheDocument();
+
+    expect(screen.getByRole("link", { name: "Nueva empresa" })).toHaveAttribute(
+      "href",
+      "/empresas/nueva",
     );
   });
 
@@ -395,7 +505,7 @@ describe("empresas", () => {
     fireEvent.change(await screen.findByLabelText(/razón social/i), {
       target: { value: "Demo" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /fiscal ya existe/i,
     );
@@ -405,7 +515,7 @@ describe("empresas", () => {
         HttpResponse.json({ detail: "validation internals" }, { status: 422 }),
       ),
     );
-    fireEvent.click(screen.getByRole("button", { name: /crear empresa/i }));
+    fireEvent.click(screen.getByRole("button", { name: /guardar empresa/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /revisa los datos/i,
     );
@@ -413,6 +523,7 @@ describe("empresas", () => {
 
   it("muestra empresa no encontrada sin detalles internos", async () => {
     server.use(
+      overviewHandler,
       http.get(
         `${api}/companies/:companyId`,
         () => new HttpResponse(null, { status: 404 }),
@@ -427,6 +538,7 @@ describe("empresas", () => {
 
   it("maneja fallos de red sin mostrar detalles internos", async () => {
     server.use(
+      overviewHandler,
       http.get(`${api}/companies/:companyId`, () => HttpResponse.error()),
     );
     renderAuthenticated("/empresas/red-caida");

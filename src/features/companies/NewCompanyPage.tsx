@@ -21,7 +21,7 @@ export function NewCompanyPage() {
           </li>
         </ol>
       </header>
-      <CompanyCreateForm guided>
+      <CompanyCreateForm>
         <section
           className="new-company-contact"
           aria-labelledby="new-company-step-two"

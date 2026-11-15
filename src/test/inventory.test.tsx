@@ -87,6 +87,11 @@ describe("inmuebles", () => {
     ).toBeInTheDocument();
     expect(requests[0].get("page")).toBe("1");
     expect(requests[0].has("city")).toBe(false);
+    expect(requests[0].get("status")).toBe("available");
+    expect(screen.getByLabelText("Estado")).toHaveValue("available");
+    expect(
+      screen.getByRole("link", { name: "Local esquina Miraflores" }),
+    ).toHaveAttribute("href", "/inmuebles/p-1");
 
     fireEvent.change(screen.getByLabelText("Buscar"), {
       target: { value: " esquina " },
@@ -98,7 +103,7 @@ describe("inmuebles", () => {
       target: { value: "retail" },
     });
     fireEvent.change(screen.getByLabelText("Estado"), {
-      target: { value: "available" },
+      target: { value: "reserved" },
     });
     fireEvent.change(screen.getByLabelText("Stock estratégico"), {
       target: { value: "yes" },
@@ -110,9 +115,22 @@ describe("inmuebles", () => {
     expect(filtered.get("q")).toBe("esquina");
     expect(filtered.get("city")).toBe("Lima");
     expect(filtered.get("property_type")).toBe("retail");
-    expect(filtered.get("status")).toBe("available");
+    expect(filtered.get("status")).toBe("reserved");
     expect(filtered.get("strategic_stock")).toBe("true");
     expect(filtered.get("page_size")).toBe("10");
+  });
+
+  it("permite ver todos los estados quitando el filtro por defecto", async () => {
+    setAccessToken("token");
+    window.history.replaceState({}, "", "/inmuebles");
+    render(<App />);
+    await screen.findByText("LOC-001");
+    fireEvent.change(screen.getByLabelText("Estado"), {
+      target: { value: "" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Filtrar" }));
+    await waitFor(() => expect(requests).toHaveLength(2));
+    expect(requests[1].has("status")).toBe(false);
   });
 
   it("muestra un mensaje cuando el backend falla", async () => {

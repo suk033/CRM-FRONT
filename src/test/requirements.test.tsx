@@ -103,6 +103,7 @@ let decisionBody: unknown;
 let requirementBody: unknown;
 let proposalBody: unknown;
 let routeBody: unknown;
+const requirementQueries: URLSearchParams[] = [];
 
 const matchResponse = () => ({
   requirement,
@@ -113,30 +114,29 @@ const matchResponse = () => ({
 
 const server = setupServer(
   http.get(`${api}/users/me`, () => HttpResponse.json(user)),
-  http.get(`${api}/requirements`, () =>
+  http.get(`${api}/companies/overview`, () =>
+    HttpResponse.json({ items: [], total: 0, active: 0 }),
+  ),
+  http.get(`${api}/companies/:id`, ({ params }) =>
     HttpResponse.json({
+      id: params.id,
+      legal_name: "Café Andino SAC",
+      trade_name: "Café Andino",
+      tax_id: null,
+      created_at: "2025-01-01T00:00:00Z",
+      contacts: [],
+    }),
+  ),
+  http.get(`${api}/activities`, () => HttpResponse.json({ items: [] })),
+  http.get(`${api}/requirements`, ({ request }) => {
+    requirementQueries.push(new URL(request.url).searchParams);
+    return HttpResponse.json({
       items: [requirement],
       page: 1,
       page_size: 50,
       total: 1,
-    }),
-  ),
-  http.get(`${api}/companies`, () =>
-    HttpResponse.json({
-      items: [
-        {
-          id: "c-1",
-          legal_name: "Café Andino SAC",
-          trade_name: "Café Andino",
-          tax_id: null,
-          created_at: "2025-01-01T00:00:00Z",
-        },
-      ],
-      page: 1,
-      page_size: 50,
-      total: 1,
-    }),
-  ),
+    });
+  }),
   http.post(`${api}/requirements`, async ({ request }) => {
     requirementBody = await request.json();
     return HttpResponse.json(requirement, { status: 201 });
@@ -214,6 +214,7 @@ afterEach(() => {
   requirementBody = undefined;
   proposalBody = undefined;
   routeBody = undefined;
+  requirementQueries.length = 0;
   window.history.replaceState({}, "", "/");
 });
 afterAll(() => server.close());
@@ -225,17 +226,15 @@ function renderAt(path: string) {
 }
 
 describe("requerimientos", () => {
-  it("lista requerimientos y crea uno con listas separadas por coma", async () => {
-    renderAt("/requerimientos");
+  it("lista los requerimientos de la empresa y crea uno con la empresa fija", async () => {
+    renderAt("/empresas/c-1?tab=requerimientos");
     expect(
       await screen.findByRole("link", { name: "Local para cafetería" }),
     ).toHaveAttribute("href", "/requerimientos/r-1");
-    expect(screen.getByText("REQ-001")).toBeInTheDocument();
+    expect(screen.getByText(/REQ-001/)).toBeInTheDocument();
+    expect(requirementQueries[0].get("company_id")).toBe("c-1");
+    expect(screen.queryByLabelText("Empresa")).not.toBeInTheDocument();
 
-    await screen.findByRole("option", { name: "Café Andino" });
-    fireEvent.change(screen.getByLabelText("Empresa"), {
-      target: { value: "c-1" },
-    });
     fireEvent.change(screen.getByLabelText("Título"), {
       target: { value: " Local para cafetería " },
     });
@@ -278,6 +277,20 @@ describe("requerimientos", () => {
       max_monthly_budget: 9000,
       required_features: ["vitrina"],
     });
+    expect(
+      screen.getByRole("link", { name: "Volver a la empresa" }),
+    ).toHaveAttribute("href", "/empresas/c-1?tab=requerimientos");
+  });
+
+  it("valida título y ciudad sin enviar", async () => {
+    renderAt("/empresas/c-1?tab=requerimientos");
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Crear requerimiento" }),
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Título y ciudad son obligatorios.",
+    );
+    expect(requirementBody).toBeUndefined();
   });
 
   it("busca candidatos, muestra el ranking y registra un rechazo con motivo", async () => {

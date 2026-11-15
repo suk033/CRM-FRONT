@@ -33,6 +33,9 @@ const server = setupServer(
       created_at: company.created_at,
     }),
   ),
+  http.get(`${api}/companies/overview`, () =>
+    HttpResponse.json({ items: [], total: 0, active: 0 }),
+  ),
   http.post(`${api}/companies`, async ({ request }) => {
     posts++;
     body = await request.json();
@@ -331,7 +334,7 @@ it("muestra solo campos soportados, pasos honestos y navegación de salida", asy
     "/empresas",
   );
   fireEvent.click(screen.getByRole("link", { name: "Cancelar" }));
-  await screen.findByRole("heading", { name: "Crear empresa" });
+  await screen.findByRole("heading", { name: "Empresas", level: 1 });
   expect(posts).toBe(0);
   expect(gets).toBe(0);
 });
@@ -471,7 +474,7 @@ it.each(["leave", "logout", "same-token"])(
     try {
       if (mode === "leave") {
         fireEvent.click(screen.getByRole("link", { name: "Cancelar" }));
-        await screen.findByRole("heading", { name: "Crear empresa" });
+        await screen.findByRole("heading", { name: "Empresas", level: 1 });
       } else {
         act(() => {
           setAccessToken(null);

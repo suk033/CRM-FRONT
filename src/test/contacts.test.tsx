@@ -31,6 +31,9 @@ let posts = 0;
 let gets = 0;
 let body: unknown;
 let saved = false;
+const overviewHandler = http.get(`${base}/companies/overview`, () =>
+  HttpResponse.json({ items: [], total: 0, active: 0 }),
+);
 const server = setupServer(
   http.get(`${base}/users/me`, () =>
     HttpResponse.json({
@@ -41,11 +44,17 @@ const server = setupServer(
       created_at: company.created_at,
     }),
   ),
+  overviewHandler,
+  http.get(`${base}/requirements`, () =>
+    HttpResponse.json({ items: [], page: 1, page_size: 100, total: 0 }),
+  ),
+  http.get(`${base}/activities`, () => HttpResponse.json({ items: [] })),
   http.get(`${base}/companies/:id`, ({ params }) => {
     gets++;
     return HttpResponse.json({
       ...company,
       id: params.id,
+      legal_name: params.id === company.id ? "SUPRA" : `SUPRA ${params.id}`,
       contacts: saved ? [contact] : [],
     });
   }),
@@ -74,7 +83,7 @@ afterEach(() => {
 });
 function open() {
   setAccessToken("same-token");
-  window.history.replaceState({}, "", "/empresas/company-a");
+  window.history.replaceState({}, "", "/empresas/company-a?tab=contactos");
   render(<App />);
 }
 async function fill(channel = "phone") {
@@ -95,23 +104,26 @@ function submit() {
   fireEvent.submit(screen.getByLabelText(/^nombre/i).closest("form")!);
 }
 
-it("Contactos ofrece lookup honesto sin empresa seleccionada", async () => {
-  open();
-  await screen.findByLabelText(/^nombre/i);
-  fireEvent.click(screen.getByRole("link", { name: /^contactos$/i }));
-  expect(
-    await screen.findByRole("heading", { name: "Contactos por empresa" }),
-  ).toBeInTheDocument();
-  expect(screen.getByText(/no existe un listado global/i)).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: /abrir contactos/i }));
-  expect(await screen.findByRole("alert")).toHaveTextContent(/ID de empresa/i);
-  fireEvent.change(screen.getByLabelText(/ID de empresa/i), {
-    target: { value: " company-b " },
-  });
-  fireEvent.click(screen.getByRole("button", { name: /abrir contactos/i }));
-  await screen.findByLabelText(/^nombre/i);
-  expect(window.location.pathname).toBe("/empresas/company-b");
-  expect(window.location.hash).toBe("#contactos");
+it("los contactos viven en la pestaña Contactos de la empresa", async () => {
+  setAccessToken("same-token");
+  window.history.replaceState({}, "", "/contactos");
+  render(<App />);
+  await screen.findByRole("heading", { name: "Empresas", level: 1 });
+  expect(window.location.pathname).toBe("/empresas");
+  cleanup();
+
+  window.history.replaceState({}, "", "/empresas/company-a#contactos");
+  render(<App />);
+  expect(await screen.findByLabelText(/^nombre/i)).toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: /contactos/i })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  fireEvent.click(screen.getByRole("tab", { name: /resumen/i }));
+  expect(screen.queryByLabelText(/^nombre/i)).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: /contactos/i }));
+  expect(window.location.search).toBe("?tab=contactos");
+  expect(screen.getByLabelText(/^nombre/i)).toBeInTheDocument();
 });
 
 it.each(["first", "last", "neither", "email"])(
@@ -246,6 +258,7 @@ it("guardado con refresh fallido no es fallo de POST y retry solo GET", async ()
   open();
   await fill();
   server.use(
+    overviewHandler,
     http.get(`${base}/companies/:id`, () => {
       gets++;
       return HttpResponse.error();
@@ -300,13 +313,11 @@ it.each(["logout", "navigation", "company-change", "new-session"])(
         }
       } else if (mode === "navigation") {
         fireEvent.click(screen.getByRole("link", { name: /^empresas$/i }));
-        await screen.findByRole("heading", { name: /crear empresa/i });
+        await screen.findByRole("heading", { name: "Empresas", level: 1 });
       } else {
-        window.history.pushState({}, "", "/empresas/company-b");
+        window.history.pushState({}, "", "/empresas/company-b?tab=contactos");
         window.dispatchEvent(new PopStateEvent("popstate"));
-        await waitFor(() =>
-          expect(screen.getByText("company-b")).toBeInTheDocument(),
-        );
+        await screen.findByRole("heading", { name: "SUPRA company-b" });
       }
       const before = gets;
       release();

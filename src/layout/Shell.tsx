@@ -7,6 +7,8 @@ import {
 } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import type { components } from "../api/schema";
+import { Avatar } from "../components/ui";
+import logo from "../assets/supra-logo.svg";
 
 type Props = {
   user?: components["schemas"]["CurrentUserResponse"];
@@ -41,10 +43,9 @@ function NavIcon({ path }: { path: string }) {
 
 const contexts = [
   ["/empresas", "Empresas"],
-  ["/contactos", "Contactos"],
+  ["/requerimientos", "Empresas"],
   ["/inmuebles", "Inmuebles"],
-  ["/requerimientos", "Requerimientos"],
-  ["/aprendizaje", "Aprendizaje"],
+  ["/perfil", "Perfil"],
 ] as const;
 
 export function Shell({ user, onLogout, children }: Props) {
@@ -120,6 +121,10 @@ export function Shell({ user, onLogout, children }: Props) {
         aria-label="Módulos"
         hidden={!desktop && !open}
       >
+        <div className="ws-nav-logo">
+          <img src={logo} alt="" aria-hidden="true" />
+          SuPra CRM
+        </div>
         <span className="shell-nav-caption">ESPACIO DE TRABAJO</span>
         <NavLink to="/" end onClick={closeMenu}>
           <NavIcon path="m3 10 9-7 9 7v10h-6v-7H9v7H3Z" />
@@ -129,27 +134,21 @@ export function Shell({ user, onLogout, children }: Props) {
           <NavIcon path="M4 21V3h12v18M16 9h4v12M8 7h4M8 11h4M8 15h4M2 21h20" />
           Empresas
         </NavLink>
-        <NavLink to="/contactos" onClick={closeMenu}>
-          <NavIcon path="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M20 21v-2a4 4 0 0 0-3-4M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM17 3a4 4 0 0 1 0 8" />
-          Contactos
-        </NavLink>
         <NavLink to="/inmuebles" onClick={closeMenu}>
           <NavIcon path="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />
           Inmuebles
         </NavLink>
-        <NavLink to="/requerimientos" onClick={closeMenu}>
-          <NavIcon path="M9 3h6v3H9ZM7 5H5v16h14V5h-2M9 12h6M9 16h4" />
-          Requerimientos
+        <NavLink to="/perfil" onClick={closeMenu}>
+          <NavIcon path="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+          Perfil
         </NavLink>
-        <NavLink to="/aprendizaje" onClick={closeMenu}>
-          <NavIcon path="M12 3 2 8l10 5 10-5ZM6 10v5c3 3 9 3 12 0v-5" />
-          Aprendizaje
-        </NavLink>
-        <button disabled>
-          <NavIcon path="M4 3h16v18H4ZM8 16v-4M12 16V8M16 16v-6" />
-          <span>Reportes · Próximamente</span>
-        </button>
-        <p className="shell-nav-footer">Empresas, inmuebles y requerimientos</p>
+        <span aria-hidden="true" />
+        {user && (
+          <div className="ws-nav-user">
+            <Avatar email={user.email} size="sm" />
+            <span>{role}</span>
+          </div>
+        )}
       </nav>
       <main className="shell-main">{children}</main>
     </div>

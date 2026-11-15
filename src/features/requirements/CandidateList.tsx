@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import type { components } from "../../api/schema";
 import {
+  candidateStatusLabels,
   featureLabel,
   formatArea,
   formatMoney,
@@ -13,13 +14,6 @@ export type Decision = {
   candidateId: string;
   status: "shortlisted" | "accepted" | "rejected";
   reason: string | null;
-};
-
-const candidateStatusLabels: Record<Candidate["status"], string> = {
-  suggested: "Sugerido",
-  shortlisted: "Preseleccionado",
-  accepted: "Aceptado",
-  rejected: "Rechazado",
 };
 
 function Breakdown({ candidate }: { candidate: Candidate }) {

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthenticatedApp, Login } from "./features/auth/auth";
 import "./styles.css";
+import "./styles/workspace.css";
 
 export const queryClient = new QueryClient();
 export function App() {

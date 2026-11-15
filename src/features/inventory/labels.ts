@@ -27,6 +27,17 @@ export const requirementStatusLabels: Record<RequirementStatus, string> = {
   lost: "Perdido",
 };
 
+export type CandidateStatus = NonNullable<
+  components["schemas"]["PropertyMatchItem"]["candidate_status"]
+>;
+
+export const candidateStatusLabels: Record<CandidateStatus, string> = {
+  suggested: "Sugerido",
+  shortlisted: "Preseleccionado",
+  accepted: "Aceptado",
+  rejected: "Rechazado",
+};
+
 export const featureLabels: Record<string, string> = {
   price_fit: "Precio",
   area_fit: "Área",

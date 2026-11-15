@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -28,6 +34,13 @@ const server = setupServer(
     seen.push(request.clone());
     return HttpResponse.json(user);
   }),
+  // Inicio loads the workspace after login.
+  http.get(`${api}/activities`, () =>
+    HttpResponse.json({ items: [], total: 0 }),
+  ),
+  http.get(`${api}/companies/overview`, () =>
+    HttpResponse.json({ items: [], total: 0, active: 0 }),
+  ),
 );
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
@@ -208,17 +221,22 @@ describe("autenticación", () => {
     expect(queryClient.getMutationCache().getAll()).toEqual([]);
   });
 
-  it("expone una shell semántica con futuros módulos deshabilitados", async () => {
+  it("expone una shell semántica con las cuatro secciones y aterriza en Inicio", async () => {
     await login();
-    expect(screen.getByRole("banner")).toBeInTheDocument();
+    // jsdom also exposes the page header inside <main> as "banner"; the shell header comes first.
+    expect(screen.getAllByRole("banner")[0]).toHaveTextContent("SUPRA CRM");
+    const nav = screen.getByRole("navigation", { name: /módulos/i });
     expect(
-      screen.getByRole("navigation", { name: /módulos/i }),
-    ).toBeInTheDocument();
+      within(nav)
+        .getAllByRole("link")
+        .map((link) => link.textContent),
+    ).toEqual(["Inicio", "Empresas", "Inmuebles", "Perfil"]);
+    expect(
+      screen.queryByRole("button", { name: /próximamente/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
-      screen
-        .getAllByRole("button", { name: /próximamente/i })
-        .every((button) => (button as HTMLButtonElement).disabled),
-    ).toBe(true);
+      await screen.findByRole("heading", { level: 1, name: "Hola, ana" }),
+    ).toBeInTheDocument();
   });
 });

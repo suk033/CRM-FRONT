@@ -64,6 +64,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/companies/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Company Overview
+         * @description Portfolio companies with open requirements, pending and overdue activities and activity status.
+         *
+         *     A company is active when it has an open requirement, a pending activity, or an activity completed in the last 30 days.
+         */
+        get: operations["get_company_overview_api_v1_companies_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Activities
+         * @description Activities of the companies in the user's portfolio, ordered by due date (admins see all).
+         */
+        get: operations["get_activities_api_v1_activities_get"];
+        put?: never;
+        /** Post Activity */
+        post: operations["post_activity_api_v1_activities_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/activities/{activity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Patch Activity
+         * @description Update an activity; setting status to done records the completion time.
+         */
+        patch: operations["patch_activity_api_v1_activities__activity_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/reports/advisors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Advisor Report
+         * @description Admin-only advisor performance: portfolio, activities in the last 30 days and candidate decisions.
+         */
+        get: operations["get_advisor_report_api_v1_reports_advisors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies/{company_id}/assignment": {
         parameters: {
             query?: never;
@@ -198,6 +281,26 @@ export interface paths {
         };
         /** Get Property */
         get: operations["get_property_api_v1_properties__property_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/properties/{property_id}/matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Property Matches
+         * @description Rank the open requirements visible to the user by how well this property fits them.
+         */
+        get: operations["get_property_matches_api_v1_properties__property_id__matches_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -366,6 +469,144 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityCreate */
+        ActivityCreate: {
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Requirement Id */
+            requirement_id?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "meeting" | "call" | "visit" | "task" | "email";
+            /** Title */
+            title: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+        };
+        /** ActivityListResponse */
+        ActivityListResponse: {
+            /** Items */
+            items: components["schemas"]["ActivityResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ActivityResponse */
+        ActivityResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Company Name */
+            company_name: string;
+            /** Requirement Id */
+            requirement_id: string | null;
+            /** Requirement Code */
+            requirement_code: string | null;
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /** Owner Email */
+            owner_email: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "meeting" | "call" | "visit" | "task" | "email";
+            /** Title */
+            title: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "done" | "cancelled";
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Overdue */
+            overdue: boolean;
+        };
+        /** ActivityUpdate */
+        ActivityUpdate: {
+            /** Status */
+            status?: ("pending" | "done" | "cancelled") | null;
+            /** Title */
+            title?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Due At */
+            due_at?: string | null;
+        };
+        /** AdvisorPerformance */
+        AdvisorPerformance: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Email */
+            email: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Companies */
+            companies: number;
+            /** Open Requirements */
+            open_requirements: number;
+            /** Activities Done 30D */
+            activities_done_30d: number;
+            /** Activities Pending */
+            activities_pending: number;
+            /** Activities Overdue */
+            activities_overdue: number;
+            /** Decisions Accepted */
+            decisions_accepted: number;
+            /** Decisions Rejected */
+            decisions_rejected: number;
+            /** Acceptance Rate */
+            acceptance_rate: number | null;
+            /** Last Activity At */
+            last_activity_at: string | null;
+        };
+        /** AdvisorReportResponse */
+        AdvisorReportResponse: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Window Days */
+            window_days: number;
+            /** Advisors */
+            advisors: components["schemas"]["AdvisorPerformance"][];
+        };
         /** CandidateDecision */
         CandidateDecision: {
             /**
@@ -473,6 +714,50 @@ export interface components {
             page_size: number;
             /** Total */
             total: number;
+        };
+        /** CompanyOverviewItem */
+        CompanyOverviewItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Legal Name */
+            legal_name: string;
+            /** Trade Name */
+            trade_name: string | null;
+            /** Tax Id */
+            tax_id: string | null;
+            /** Assigned Advisor Id */
+            assigned_advisor_id: string | null;
+            /** Assigned Advisor Email */
+            assigned_advisor_email: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "inactive";
+            /** Open Requirements */
+            open_requirements: number;
+            /** Total Requirements */
+            total_requirements: number;
+            /** Pending Activities */
+            pending_activities: number;
+            /** Overdue Activities */
+            overdue_activities: number;
+            /** Last Activity At */
+            last_activity_at: string | null;
+            /** Next Activity At */
+            next_activity_at: string | null;
+        };
+        /** CompanyOverviewResponse */
+        CompanyOverviewResponse: {
+            /** Items */
+            items: components["schemas"]["CompanyOverviewItem"][];
+            /** Total */
+            total: number;
+            /** Active */
+            active: number;
         };
         /** CompanyResponse */
         CompanyResponse: {
@@ -766,6 +1051,55 @@ export interface components {
             page_size: number;
             /** Total */
             total: number;
+        };
+        /** PropertyMatchItem */
+        PropertyMatchItem: {
+            /**
+             * Requirement Id
+             * Format: uuid
+             */
+            requirement_id: string;
+            /** Requirement Code */
+            requirement_code: string;
+            /** Requirement Title */
+            requirement_title: string;
+            /**
+             * Requirement Status
+             * @enum {string}
+             */
+            requirement_status: "open" | "searching" | "proposal" | "won" | "lost";
+            /**
+             * Company Id
+             * Format: uuid
+             */
+            company_id: string;
+            /** Company Name */
+            company_name: string;
+            /** Rule Score */
+            rule_score: number;
+            /** Rule Contributions */
+            rule_contributions: {
+                [key: string]: number;
+            };
+            /** Gaps */
+            gaps: string[];
+            /** Ml Probability */
+            ml_probability: number | null;
+            /** Candidate Status */
+            candidate_status: ("suggested" | "shortlisted" | "accepted" | "rejected") | null;
+        };
+        /** PropertyMatchResponse */
+        PropertyMatchResponse: {
+            property: components["schemas"]["PropertyResponse"];
+            /**
+             * Ranking
+             * @enum {string}
+             */
+            ranking: "rules" | "model";
+            /** Model Version */
+            model_version: number | null;
+            /** Matches */
+            matches: components["schemas"]["PropertyMatchItem"][];
         };
         /** PropertyResponse */
         PropertyResponse: {
@@ -1093,6 +1427,165 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CurrentUserResponse"];
+                };
+            };
+        };
+    };
+    get_company_overview_api_v1_companies_overview_get: {
+        parameters: {
+            query?: {
+                status?: ("active" | "inactive") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyOverviewResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_activities_api_v1_activities_get: {
+        parameters: {
+            query?: {
+                status?: ("pending" | "done" | "cancelled") | null;
+                company_id?: string | null;
+                due_before?: string | null;
+                due_after?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_activity_api_v1_activities_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityResponse"];
+                };
+            };
+            /** @description company or requirement not found */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patch_activity_api_v1_activities__activity_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                activity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityResponse"];
+                };
+            };
+            /** @description activity not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_advisor_report_api_v1_reports_advisors_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdvisorReportResponse"];
                 };
             };
         };
@@ -1460,6 +1953,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PropertyResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_property_matches_api_v1_properties__property_id__matches_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                property_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyMatchResponse"];
                 };
             };
             /** @description resource not found */
