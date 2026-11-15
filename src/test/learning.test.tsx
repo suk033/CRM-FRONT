@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
@@ -62,16 +63,55 @@ const evidence = {
     trained_at: "2025-01-02T00:00:00Z",
   },
 };
+const versions = [
+  evidence.active_model,
+  {
+    ...evidence.active_model,
+    version: 2,
+    is_active: false,
+    sample_count: 30,
+    trained_at: "2025-01-01T00:00:00Z",
+    metrics: { ...evidence.active_model.metrics, improves_on_rules: false },
+  },
+];
+const behavior = {
+  model_version: 3,
+  open_candidates: { total: 20, high: 5, medium: 7, low: 8 },
+  history: {
+    decisions: 40,
+    avg_probability_accepted: 0.81,
+    avg_probability_rejected: 0.22,
+    agreement_rate: 0.9,
+  },
+  rule_agreement_rate: 0.75,
+};
 let currentUser: typeof admin = admin;
+const activations: unknown[] = [];
+let trainStatus = 409;
 
 const server = setupServer(
   http.get(`${api}/users/me`, () => HttpResponse.json(currentUser)),
   http.get(`${api}/ml/evidence`, () => HttpResponse.json(evidence)),
+  http.get(`${api}/ml/models`, () => HttpResponse.json({ items: versions })),
+  http.get(`${api}/ml/behavior`, () => HttpResponse.json(behavior)),
+  http.put(`${api}/ml/active-model`, async ({ request }) => {
+    const body = (await request.json()) as { version: number | null };
+    activations.push(body);
+    return HttpResponse.json({
+      version: body.version,
+      ranking: body.version === null ? "rules" : "model",
+    });
+  }),
   http.post(`${api}/ml/models`, () =>
-    HttpResponse.json(
-      { detail: "need at least 10 rejected decisions" },
-      { status: 409 },
-    ),
+    trainStatus === 201
+      ? HttpResponse.json(
+          { ...evidence.active_model, version: 4 },
+          { status: 201 },
+        )
+      : HttpResponse.json(
+          { detail: "need at least 10 rejected decisions" },
+          { status: 409 },
+        ),
   ),
 );
 
@@ -82,6 +122,8 @@ afterEach(() => {
   queryClient.clear();
   server.resetHandlers();
   currentUser = admin;
+  activations.length = 0;
+  trainStatus = 409;
   window.history.replaceState({}, "", "/");
 });
 afterAll(() => server.close());
@@ -102,42 +144,112 @@ describe("aprendizaje", () => {
     expect(window.location.search).toBe("?seccion=modelo");
   });
 
-  it("muestra evidencia, métricas frente a reglas y coeficientes", async () => {
+  it("explica el modelo y muestra su desempeño y comportamiento en lenguaje simple", async () => {
     renderLearning();
     expect(
-      await screen.findByRole("heading", {
-        name: "Regresión logística · versión 3",
-      }),
+      await screen.findByRole("heading", { name: "¿Qué hace el modelo?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Decisiones").nextSibling).toHaveTextContent("40");
-    expect(screen.getByText("Aceptadas").nextSibling).toHaveTextContent("22");
-    expect(screen.getByText("Rechazadas").nextSibling).toHaveTextContent("18");
+    const status = await screen.findByLabelText("Estado del modelo");
+    expect(status).toHaveTextContent("Modelo v3");
+    expect(status).toHaveTextContent("22 / 18");
 
-    const accuracy = screen.getByRole("row", { name: /^Exactitud 0.840/ });
-    expect(accuracy).toHaveTextContent("0.720");
-    expect(screen.getByRole("row", { name: /Log loss/ })).toHaveTextContent(
-      "0.4100.550",
-    );
-    expect(screen.getByText("0.812 ± 0.043")).toBeInTheDocument();
-    const matrix = screen.getByRole("table", { name: /matriz de confusión/i });
-    expect(within(matrix).getByText("VP 11")).toBeInTheDocument();
-    expect(within(matrix).getByText("FN 3")).toBeInTheDocument();
-    const coefficients = screen.getByRole("list", {
-      name: "Coeficientes por criterio",
+    const performance = screen.getByRole("table", {
+      name: "Desempeño frente a las reglas",
     });
-    expect(coefficients).toHaveTextContent("Precio1.200");
-    expect(coefficients).toHaveTextContent("Área-0.600");
-    expect(screen.getByText(/mejora a la línea base/)).toBeInTheDocument();
+    expect(
+      within(performance).getByRole("row", { name: /Aciertos en general/ }),
+    ).toHaveTextContent("84 de cada 100");
+    expect(
+      within(performance).getByRole("row", { name: /Aciertos en general/ }),
+    ).toHaveTextContent("72 de cada 100");
+    expect(screen.getAllByText("Mejora a las reglas").length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      screen.getByText(/mantiene una exactitud balanceada de/),
+    ).toHaveTextContent("81 %");
+
+    const buckets = await screen.findByRole("list", {
+      name: "Candidatos por probabilidad",
+    });
+    expect(buckets).toHaveTextContent("Alta (70 % o más)5");
+    expect(
+      screen.getByText("Probabilidad promedio que dio a lo que se aceptó")
+        .nextSibling,
+    ).toHaveTextContent("81 %");
+    expect(
+      screen.getByText("Coincide con las decisiones de los asesores")
+        .nextSibling,
+    ).toHaveTextContent("90 %");
+    expect(
+      screen.getByRole("list", { name: "Peso de cada criterio" }),
+    ).toHaveTextContent("Precio");
   });
 
-  it("muestra el detalle 409 cuando la evidencia es insuficiente", async () => {
+  it("activa otra versión o vuelve a reglas con confirmación", async () => {
     renderLearning();
+    const activate = await screen.findByRole("button", {
+      name: "Activar versión 2",
+    });
+    expect(
+      screen.getByRole("button", { name: "Activar versión 3" }),
+    ).toBeDisabled();
+    fireEvent.click(activate);
+    const dialog = screen.getByRole("alertdialog", {
+      name: "¿Activar la versión 2?",
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Confirmar" }));
+    await waitFor(() => expect(activations).toEqual([{ version: 2 }]));
+    expect(
+      await screen.findByText("La versión 2 quedó activa."),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Usar solo reglas" }));
     fireEvent.click(
-      await screen.findByRole("button", { name: "Entrenar nuevo modelo" }),
+      within(
+        screen.getByRole("alertdialog", { name: "¿Usar solo las reglas?" }),
+      ).getByRole("button", { name: "Confirmar" }),
     );
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "La operación no se puede completar todavía. need at least 10 rejected decisions",
+    await waitFor(() =>
+      expect(activations).toEqual([{ version: 2 }, { version: null }]),
     );
+    expect(
+      await screen.findByText("El ranking usa ahora solo las reglas."),
+    ).toBeInTheDocument();
+  });
+
+  it("entrenar pide confirmación y muestra el rechazo del backend", async () => {
+    renderLearning();
+    const trainButton = await screen.findByRole("button", {
+      name: "Entrenar nueva versión",
+    });
+    await waitFor(() => expect(trainButton).toBeEnabled());
+    fireEvent.click(trainButton);
+    fireEvent.click(
+      within(
+        screen.getByRole("alertdialog", {
+          name: "¿Entrenar una nueva versión?",
+        }),
+      ).getByRole("button", { name: "Entrenar" }),
+    );
+    expect(
+      await screen.findByText(
+        "La operación no se puede completar todavía. need at least 10 rejected decisions",
+      ),
+    ).toBeInTheDocument();
+
+    trainStatus = 201;
+    fireEvent.click(
+      screen.getByRole("button", { name: "Entrenar nueva versión" }),
+    );
+    fireEvent.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "Entrenar",
+      }),
+    );
+    expect(
+      await screen.findByText("Versión 4 entrenada y activada."),
+    ).toBeInTheDocument();
   });
 
   it("el modelo y su entrenamiento son solo del administrador", async () => {
@@ -147,12 +259,10 @@ describe("aprendizaje", () => {
       await screen.findByLabelText("Indicadores personales"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", {
-        name: "Regresión logística · versión 3",
-      }),
+      screen.queryByRole("heading", { name: "¿Qué hace el modelo?" }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Entrenar nuevo modelo" }),
+      screen.queryByRole("button", { name: "Entrenar nueva versión" }),
     ).not.toBeInTheDocument();
   });
 });

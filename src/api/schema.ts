@@ -496,7 +496,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Models
+         * @description Admin only: every trained version, newest first, with its evaluation metrics.
+         */
+        get: operations["get_models_api_v1_ml_models_get"];
         put?: never;
         /**
          * Post Model
@@ -509,10 +513,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ml/active-model": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Active Model
+         * @description Admin only: activate a stored version, or send null to rank candidates with the rules only.
+         */
+        put: operations["put_active_model_api_v1_ml_active_model_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ml/behavior": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Model Behavior
+         * @description Admin only: how the active model scores open candidates and agrees with decisions and rules.
+         */
+        get: operations["get_model_behavior_api_v1_ml_behavior_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActiveModelRequest */
+        ActiveModelRequest: {
+            /**
+             * Version
+             * @description Version to activate, or null to rank with rules only
+             */
+            version: number | null;
+        };
+        /** ActiveModelResponse */
+        ActiveModelResponse: {
+            /** Version */
+            version: number | null;
+            /**
+             * Ranking
+             * @enum {string}
+             */
+            ranking: "rules" | "model";
+        };
         /** ActivityCreate */
         ActivityCreate: {
             /**
@@ -885,6 +947,17 @@ export interface components {
              */
             created_at: string;
         };
+        /** DecisionHistoryStats */
+        DecisionHistoryStats: {
+            /** Decisions */
+            decisions: number;
+            /** Avg Probability Accepted */
+            avg_probability_accepted: number | null;
+            /** Avg Probability Rejected */
+            avg_probability_rejected: number | null;
+            /** Agreement Rate */
+            agreement_rate: number;
+        };
         /** EvidenceResponse */
         EvidenceResponse: {
             /** Decisions */
@@ -941,6 +1014,20 @@ export interface components {
             /** Candidates */
             candidates: components["schemas"]["CandidateResponse"][];
         };
+        /** ModelBehaviorResponse */
+        ModelBehaviorResponse: {
+            /** Model Version */
+            model_version: number | null;
+            open_candidates: components["schemas"]["OpenCandidateBuckets"] | null;
+            history: components["schemas"]["DecisionHistoryStats"] | null;
+            /** Rule Agreement Rate */
+            rule_agreement_rate: number | null;
+        };
+        /** ModelListResponse */
+        ModelListResponse: {
+            /** Items */
+            items: components["schemas"]["ModelResponse"][];
+        };
         /** ModelResponse */
         ModelResponse: {
             /** Version */
@@ -966,6 +1053,17 @@ export interface components {
              * Format: date-time
              */
             trained_at: string;
+        };
+        /** OpenCandidateBuckets */
+        OpenCandidateBuckets: {
+            /** Total */
+            total: number;
+            /** High */
+            high: number;
+            /** Medium */
+            medium: number;
+            /** Low */
+            low: number;
         };
         /** OwnerCreate */
         OwnerCreate: {
@@ -2515,6 +2613,26 @@ export interface operations {
             };
         };
     };
+    get_models_api_v1_ml_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelListResponse"];
+                };
+            };
+        };
+    };
     post_model_api_v1_ml_models_post: {
         parameters: {
             query?: never;
@@ -2539,6 +2657,66 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    put_active_model_api_v1_ml_active_model_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActiveModelRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActiveModelResponse"];
+                };
+            };
+            /** @description resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_model_behavior_api_v1_ml_behavior_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelBehaviorResponse"];
+                };
             };
         };
     };

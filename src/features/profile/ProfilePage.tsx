@@ -16,7 +16,7 @@ import {
   Tabs,
 } from "../../components/ui";
 import { formatPercent } from "../inventory/labels";
-import { LearningPanel } from "../learning/LearningPanel";
+import { ModelPanel } from "../learning/ModelPanel";
 import {
   completedWithin,
   roleLabel,
@@ -126,7 +126,7 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         {active === "equipo" && <TeamActivities />}
         {active === "usuarios" && <AdminUsers currentUserId={user.id} />}
         {active === "asignacion" && <AdminAssignments />}
-        {active === "modelo" && <LearningPanel user={user} />}
+        {active === "modelo" && <ModelPanel />}
       </div>
     </div>
   );

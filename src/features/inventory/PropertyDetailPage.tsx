@@ -13,6 +13,7 @@ import {
   call,
   candidateStatusLabels,
   featureLabel,
+  propertyFeatureLabel,
   formatArea,
   formatMoney,
   formatPercent,
@@ -221,7 +222,7 @@ export function PropertyDetailPage() {
               <h3 className="property-subtitle">Características</h3>
               <span className="property-chips">
                 {property.features.map((feature) => (
-                  <Pill key={feature}>{feature.replace(/_/g, " ")}</Pill>
+                  <Pill key={feature}>{propertyFeatureLabel(feature)}</Pill>
                 ))}
               </span>
             </div>

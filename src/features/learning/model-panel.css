@@ -1,0 +1,97 @@
+.model-steps {
+  counter-reset: step;
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.model-steps li {
+  background: var(--color-surface);
+  border-radius: 0.625rem;
+  color: var(--color-muted);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem 1rem;
+}
+.model-steps li::before {
+  color: var(--color-accent-text);
+  content: counter(step);
+  counter-increment: step;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.model-steps strong {
+  color: var(--color-heading);
+}
+.model-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.model-actions button,
+.model-panel td .secondary-action {
+  margin: 0;
+  min-height: 2.25rem;
+  padding: 0.375rem 0.75rem;
+}
+.model-subtitle {
+  color: var(--color-heading);
+  font-weight: 600;
+  margin: 0 0 0.625rem;
+}
+.model-buckets,
+.model-weights {
+  display: grid;
+  gap: 0.625rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.model-buckets li,
+.model-weights li {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr) auto;
+}
+.model-bar {
+  background: var(--color-surface);
+  border-radius: 999px;
+  height: 0.625rem;
+  overflow: hidden;
+}
+.model-bar > span {
+  background: var(--tone);
+  display: block;
+  height: 100%;
+}
+.model-facts {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.model-facts div {
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+}
+.model-facts dt {
+  color: var(--color-muted);
+}
+.model-facts dd {
+  color: var(--color-heading);
+  font-weight: 800;
+  margin: 0;
+}
+.model-details summary {
+  color: var(--color-heading);
+  cursor: pointer;
+  font-weight: 700;
+}
+.model-details[open] summary {
+  margin-bottom: 0.75rem;
+}
