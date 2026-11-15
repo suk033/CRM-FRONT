@@ -4,7 +4,7 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 
 ## Módulos inmobiliarios (Fase 3)
 
-- `/` (Inicio): pendientes del asesor agrupados en vencidas, hoy y próximas (completar con un clic), KPIs, alta rápida de actividades, empresas que requieren atención y actividades completadas. El administrador ve el trabajo del equipo.
+- `/` (Inicio): el asesor ve sus KPIs, su agenda semanal (lunes a domingo, navegable, con color por tipo de actividad), sus pendientes agrupados en vencidas, hoy y próximas (completar con confirmación), el alta rápida de actividades, empresas que requieren atención y actividades completadas. El administrador ve el rendimiento de SuPra: indicadores del equipo, actividades completadas y pendientes por colaborador, tarjetas por asesor (cumplimiento, aceptación, vencidas) y la agenda de todo el equipo.
 - `/empresas`: cartera con filtro Activas (por defecto), Inactivas y Todas, búsqueda por nombre o RUC, asesor, requerimientos abiertos, actividades pendientes y vencidas, próxima y última actividad. `/empresas/nueva` crea una empresa.
 - `/empresas/:id`: espacio de la empresa con pestañas Resumen, Requerimientos (listado y alta), Actividades (agenda y seguimiento) y Contactos (`?tab=`).
 - `/requerimientos/:id`: ranking de candidatos por reglas (y probabilidad del modelo cuando existe), desglose por criterio, decisiones (preseleccionar, aceptar, rechazar con motivo), propuesta optimizada con Hill Climbing y ruta de visitas BFS vs A*.

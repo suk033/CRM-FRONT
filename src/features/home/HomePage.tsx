@@ -22,6 +22,8 @@ import {
   type CurrentUser,
 } from "./workspaceData";
 import "./home.css";
+import { Agenda } from "./Agenda";
+import { TeamPerformance } from "./TeamPerformance";
 
 function needsAttention(company: CompanyOverview) {
   return (
@@ -58,7 +60,7 @@ export function HomePage({ user }: { user?: CurrentUser }) {
             <>
               {roleLabel(user.role)} ·{" "}
               {isAdmin
-                ? "ves las actividades de todo el equipo."
+                ? "así va SuPra y el trabajo de tus colaboradores."
                 : "estos son tus pendientes con tus empresas."}
             </>
           ) : (
@@ -74,32 +76,41 @@ export function HomePage({ user }: { user?: CurrentUser }) {
         }
       />
 
-      <div className="ws-stats" aria-label="Indicadores">
-        <StatTile
-          label="Vencidas"
-          tone="danger"
-          value={count(groups.overdue.length, pending.isSuccess)}
-        />
-        <StatTile
-          label="Para hoy"
-          tone="warning"
-          value={count(groups.today.length, pending.isSuccess)}
-        />
-        <StatTile
-          label="Próximos 7 días"
-          tone="info"
-          value={count(groups.nextSevenDays, pending.isSuccess)}
-        />
-        <StatTile
-          label="Empresas activas"
-          tone="success"
-          value={count(overview.data?.active ?? 0, overview.isSuccess)}
-        />
-        <StatTile
-          label="Requerimientos abiertos"
-          value={count(openRequirements, overview.isSuccess)}
-        />
-      </div>
+      {isAdmin ? (
+        <TeamPerformance />
+      ) : (
+        <div className="ws-stats" aria-label="Indicadores">
+          <StatTile
+            label="Vencidas"
+            tone="danger"
+            value={count(groups.overdue.length, pending.isSuccess)}
+          />
+          <StatTile
+            label="Para hoy"
+            tone="warning"
+            value={count(groups.today.length, pending.isSuccess)}
+          />
+          <StatTile
+            label="Próximos 7 días"
+            tone="info"
+            value={count(groups.nextSevenDays, pending.isSuccess)}
+          />
+          <StatTile
+            label="Empresas activas"
+            tone="success"
+            value={count(overview.data?.active ?? 0, overview.isSuccess)}
+          />
+          <StatTile
+            label="Requerimientos abiertos"
+            value={count(openRequirements, overview.isSuccess)}
+          />
+        </div>
+      )}
+
+      <Agenda
+        title={isAdmin ? "Agenda del equipo" : "Mi agenda de la semana"}
+        showOwner={isAdmin}
+      />
 
       <div className="ws-grid ws-grid-main">
         <Panel title={isAdmin ? "Pendientes del equipo" : "Mis pendientes"}>

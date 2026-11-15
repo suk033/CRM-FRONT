@@ -135,6 +135,28 @@ const server = setupServer(
     return HttpResponse.json({ items, total: items.length });
   }),
   http.get(`${api}/companies/overview`, () => HttpResponse.json(overview)),
+  http.get(`${api}/reports/advisors`, () =>
+    HttpResponse.json({
+      generated_at: "2026-11-15T12:00:00Z",
+      window_days: 30,
+      advisors: [
+        {
+          user_id: "u-1",
+          email: "luis.rojas@supra.test",
+          is_active: true,
+          companies: 3,
+          open_requirements: 4,
+          activities_done_30d: 6,
+          activities_pending: 2,
+          activities_overdue: 1,
+          decisions_accepted: 3,
+          decisions_rejected: 1,
+          acceptance_rate: 0.75,
+          last_activity_at: null,
+        },
+      ],
+    }),
+  ),
   http.patch(`${api}/activities/:id`, async ({ request, params }) => {
     const body = await request.json();
     patches.push({ id: params.id, body });
@@ -184,7 +206,9 @@ describe("Inicio", () => {
     expect(screen.getByText(/estos son tus pendientes/)).toHaveTextContent(
       /^Asesor ·/,
     );
-    await screen.findByText("Llamar a gerencia");
+    await within(
+      await screen.findByRole("region", { name: "Mis pendientes" }),
+    ).findByText("Llamar a gerencia");
 
     const overdue = group(/^Vencidas/);
     expect(within(overdue).getAllByRole("listitem")).toHaveLength(1);
@@ -207,7 +231,9 @@ describe("Inicio", () => {
 
   it("muestra KPIs de vencidas, hoy, 7 días, empresas activas y requerimientos", async () => {
     renderHome();
-    await screen.findByText("Llamar a gerencia");
+    await within(
+      await screen.findByRole("region", { name: "Mis pendientes" }),
+    ).findByText("Llamar a gerencia");
     const tiles = screen.getByLabelText("Indicadores");
     await waitFor(() =>
       expect(
@@ -310,5 +336,56 @@ describe("Inicio", () => {
     renderHome();
     expect((await screen.findAllByRole("alert")).length).toBeGreaterThan(0);
     expect(screen.queryByText("Llamar a gerencia")).not.toBeInTheDocument();
+  });
+});
+
+describe("agenda", () => {
+  it("muestra la semana con las actividades del día y navega entre semanas", async () => {
+    renderHome();
+    const agenda = await screen.findByRole("region", {
+      name: "Mi agenda de la semana",
+    });
+    const today = await within(agenda).findByRole("region", {
+      name: /\(hoy\)$/,
+    });
+    expect(
+      await within(today).findByText("Reunión de presentación"),
+    ).toBeInTheDocument();
+    expect(within(agenda).getByRole("button", { name: "Hoy" })).toBeDisabled();
+    fireEvent.click(
+      within(agenda).getByRole("button", { name: "Semana siguiente" }),
+    );
+    expect(within(agenda).getByRole("button", { name: "Hoy" })).toBeEnabled();
+    expect(
+      within(agenda).queryByRole("region", { name: /\(hoy\)$/ }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("rendimiento de SuPra (administrador)", () => {
+  it("muestra indicadores del equipo, actividades por colaborador y la agenda del equipo", async () => {
+    currentUser = { ...advisor, email: "ana@supra.test", role: "admin" };
+    renderHome();
+    const tiles = await screen.findByLabelText("Rendimiento de SuPra");
+    await waitFor(() =>
+      expect(
+        within(tiles).getByText("Actividades completadas").nextSibling,
+      ).toHaveTextContent("6"),
+    );
+    expect(
+      within(tiles).getByText("Aceptación de candidatos").nextSibling,
+    ).toHaveTextContent("75 %");
+    const chart = screen.getByRole("list", {
+      name: "Actividades completadas y pendientes por asesor",
+    });
+    expect(
+      within(chart).getByRole("listitem", {
+        name: "luis.rojas@supra.test: 6 completadas, 2 pendientes, 1 vencidas",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("1 vencidas")).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Agenda del equipo" }),
+    ).toBeInTheDocument();
   });
 });
