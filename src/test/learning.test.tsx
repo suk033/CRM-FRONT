@@ -93,6 +93,15 @@ function renderLearning() {
 }
 
 describe("aprendizaje", () => {
+  it("la ruta antigua /aprendizaje abre la pestaña Modelo ML del perfil", async () => {
+    renderLearning();
+    expect(
+      await screen.findByRole("tab", { name: "Modelo ML" }),
+    ).toHaveAttribute("aria-selected", "true");
+    expect(window.location.pathname).toBe("/perfil");
+    expect(window.location.search).toBe("?seccion=modelo");
+  });
+
   it("muestra evidencia, métricas frente a reglas y coeficientes", async () => {
     renderLearning();
     expect(

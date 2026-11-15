@@ -4,33 +4,119 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import type { components } from "../../api/schema";
+import { EmptyState, Pill, type Tone } from "../../components/ui";
 import {
   call,
+  formatArea,
+  formatMoney,
   propertyTypeLabels,
   requirementStatusLabels,
   splitList,
   type PropertyType,
+  type RequirementStatus,
 } from "../inventory/labels";
 
 type RequirementCreate = components["schemas"]["RequirementCreate"];
+export type Requirement = components["schemas"]["RequirementResponse"];
 
-function RequirementCreateForm() {
-  const navigate = useNavigate();
-  const client = useQueryClient();
-  const [formError, setFormError] = useState<string | null>(null);
-  const companies = useQuery({
-    queryKey: ["companies-options"],
+export const openRequirementStatuses: RequirementStatus[] = [
+  "open",
+  "searching",
+  "proposal",
+];
+
+export const requirementStatusTones: Record<RequirementStatus, Tone> = {
+  open: "info",
+  searching: "warning",
+  proposal: "info",
+  won: "success",
+  lost: "neutral",
+};
+
+export function useCompanyRequirements(companyId: string) {
+  return useQuery({
+    queryKey: ["requirements", { company_id: companyId }],
+    enabled: Boolean(companyId),
     retry: false,
     queryFn: () =>
       call(() =>
-        api.GET("/api/v1/companies", { params: { query: { page_size: 50 } } }),
+        api.GET("/api/v1/requirements", {
+          params: { query: { company_id: companyId, page_size: 100 } },
+        }),
       ),
   });
+}
+
+/** Compact requirement table; every row opens the requirement workspace. */
+export function RequirementTable({
+  items,
+  empty = "Esta empresa todavía no tiene requerimientos.",
+}: {
+  items: Requirement[];
+  empty?: string;
+}) {
+  if (items.length === 0) return <EmptyState>{empty}</EmptyState>;
+  return (
+    <div className="ws-table-wrap">
+      <table className="ws-table">
+        <thead>
+          <tr>
+            <th scope="col">Requerimiento</th>
+            <th scope="col">Ubicación</th>
+            <th scope="col">Área</th>
+            <th scope="col">Presupuesto</th>
+            <th scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((requirement) => (
+            <tr key={requirement.id}>
+              <td>
+                <Link to={`/requerimientos/${requirement.id}`}>
+                  {requirement.title}
+                </Link>
+                <span className="ws-muted">
+                  {requirement.code} ·{" "}
+                  {propertyTypeLabels[requirement.property_type]}
+                </span>
+              </td>
+              <td>
+                {requirement.city}
+                {requirement.districts.length > 0 && (
+                  <span className="ws-muted">
+                    {requirement.districts.join(", ")}
+                  </span>
+                )}
+              </td>
+              <td>
+                {formatArea(requirement.min_area_m2)} –{" "}
+                {formatArea(requirement.max_area_m2)}
+              </td>
+              <td>{formatMoney(requirement.max_monthly_budget)}</td>
+              <td>
+                <Pill tone={requirementStatusTones[requirement.status]}>
+                  {requirementStatusLabels[requirement.status]}
+                </Pill>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Creates a requirement for a fixed company and opens it to search candidates. */
+export function RequirementCreateForm({ companyId }: { companyId: string }) {
+  const navigate = useNavigate();
+  const client = useQueryClient();
+  const [formError, setFormError] = useState<string | null>(null);
   const create = useMutation({
     mutationFn: (body: RequirementCreate) =>
       call(() => api.POST("/api/v1/requirements", { body })),
     onSuccess: (requirement) => {
       void client.invalidateQueries({ queryKey: ["requirements"] });
+      void client.invalidateQueries({ queryKey: ["companies-overview"] });
       navigate(`/requerimientos/${requirement.id}`);
     },
     onError: (error) => setFormError(error.message),
@@ -43,7 +129,7 @@ function RequirementCreateForm() {
     const form = new FormData(event.currentTarget);
     const text = (name: string) => String(form.get(name) ?? "").trim();
     const body: RequirementCreate = {
-      company_id: text("company_id"),
+      company_id: companyId,
       title: text("title"),
       property_type: text("property_type") as PropertyType,
       city: text("city"),
@@ -53,8 +139,8 @@ function RequirementCreateForm() {
       max_monthly_budget: Number(text("max_monthly_budget")),
       required_features: splitList(form.get("required_features")),
     };
-    if (!body.company_id || !body.title || !body.city) {
-      setFormError("Empresa, título y ciudad son obligatorios.");
+    if (!body.title || !body.city) {
+      setFormError("Título y ciudad son obligatorios.");
       return;
     }
     const numbers = [
@@ -95,6 +181,7 @@ function RequirementCreateForm() {
       className="filter-form"
       onSubmit={submit}
       noValidate
+      aria-label="Nuevo requerimiento"
       aria-busy={create.isPending}
     >
       {formError && (
@@ -102,28 +189,6 @@ function RequirementCreateForm() {
           {formError}
         </p>
       )}
-      <div className="field-group">
-        <label className="form-field" htmlFor="requirement-company">
-          Empresa
-        </label>
-        <select
-          id="requirement-company"
-          name="company_id"
-          defaultValue=""
-          disabled={create.isPending || companies.isLoading}
-        >
-          <option value="">
-            {companies.isLoading
-              ? "Cargando empresas…"
-              : "Selecciona una empresa"}
-          </option>
-          {companies.data?.items.map((company) => (
-            <option key={company.id} value={company.id}>
-              {company.trade_name || company.legal_name}
-            </option>
-          ))}
-        </select>
-      </div>
       {field("requirement-title", "Título", "title")}
       <div className="field-group">
         <label className="form-field" htmlFor="requirement-type">
@@ -171,11 +236,6 @@ function RequirementCreateForm() {
         "Características requeridas (separadas por coma)",
         "required_features",
       )}
-      {companies.isError && (
-        <p className="form-error form-span" role="alert">
-          {companies.error.message}
-        </p>
-      )}
       <button
         className="primary-action"
         type="submit"
@@ -184,86 +244,5 @@ function RequirementCreateForm() {
         {create.isPending ? "Creando…" : "Crear requerimiento"}
       </button>
     </form>
-  );
-}
-
-export function RequirementsPage() {
-  const requirements = useQuery({
-    queryKey: ["requirements"],
-    retry: false,
-    queryFn: () =>
-      call(() =>
-        api.GET("/api/v1/requirements", {
-          params: { query: { page_size: 50 } },
-        }),
-      ),
-  });
-  return (
-    <div className="module-page">
-      <section
-        className="workspace-card feature-card module-card"
-        aria-labelledby="requirements-title"
-      >
-        <p className="eyebrow">REQUERIMIENTOS</p>
-        <h1 id="requirements-title">Requerimientos</h1>
-        <p>
-          Lo que cada empresa necesita: tipo de inmueble, zona, área y
-          presupuesto. Abre uno para buscar candidatos.
-        </p>
-        {requirements.isLoading && (
-          <p role="status">Cargando requerimientos…</p>
-        )}
-        {requirements.isError && (
-          <p className="form-error" role="alert">
-            {requirements.error.message}
-          </p>
-        )}
-        {requirements.data?.items.length === 0 && (
-          <p className="empty-state">Todavía no hay requerimientos.</p>
-        )}
-        {requirements.data && requirements.data.items.length > 0 && (
-          <div className="table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th scope="col">Código</th>
-                  <th scope="col">Requerimiento</th>
-                  <th scope="col">Ciudad</th>
-                  <th scope="col">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requirements.data.items.map((requirement) => (
-                  <tr key={requirement.id}>
-                    <td>{requirement.code}</td>
-                    <td>
-                      <Link to={`/requerimientos/${requirement.id}`}>
-                        {requirement.title}
-                      </Link>
-                      <small>
-                        {propertyTypeLabels[requirement.property_type]}
-                      </small>
-                    </td>
-                    <td>{requirement.city}</td>
-                    <td>
-                      <span className="badge">
-                        {requirementStatusLabels[requirement.status]}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-      <section
-        className="workspace-card feature-card module-card"
-        aria-labelledby="new-requirement-title"
-      >
-        <h2 id="new-requirement-title">Nuevo requerimiento</h2>
-        <RequirementCreateForm />
-      </section>
-    </div>
   );
 }

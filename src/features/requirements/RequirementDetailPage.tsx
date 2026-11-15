@@ -117,8 +117,8 @@ export function RequirementDetailPage() {
         <p className="form-error" role="alert">
           {matches.error?.message}
         </p>
-        <Link className="secondary-action action-link" to="/requerimientos">
-          Volver a requerimientos
+        <Link className="secondary-action action-link" to="/empresas">
+          Volver a empresas
         </Link>
       </section>
     );
@@ -131,8 +131,11 @@ export function RequirementDetailPage() {
         className="workspace-card feature-card module-card"
         aria-labelledby="requirement-title"
       >
-        <Link className="new-company-back" to="/requerimientos">
-          Volver a Requerimientos
+        <Link
+          className="new-company-back"
+          to={`/empresas/${requirement.company_id}?tab=requerimientos`}
+        >
+          Volver a la empresa
         </Link>
         <p className="eyebrow">DETALLE DE REQUERIMIENTO</p>
         <h1 id="requirement-title">{requirement.title}</h1>

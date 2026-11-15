@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, useNavigate } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Shell } from "../layout/Shell";
@@ -26,7 +26,7 @@ function compactViewport() {
 
 function RouteChange() {
   const navigate = useNavigate();
-  return <button onClick={() => navigate("/contactos")}>Cambiar ruta</button>;
+  return <button onClick={() => navigate("/inmuebles")}>Cambiar ruta</button>;
 }
 
 describe("shell autenticada", () => {
@@ -81,7 +81,7 @@ describe("shell autenticada", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cambiar ruta" }));
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(toggle);
-    expect(screen.getByRole("link", { name: "Contactos" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Inmuebles" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -175,20 +175,18 @@ describe("shell autenticada", () => {
       "aria-current",
       "page",
     );
-    expect(screen.getByRole("link", { name: /^contactos$/i })).toHaveAttribute(
-      "href",
-      "/contactos",
-    );
+    const nav = screen.getByRole("navigation", { name: "Módulos" });
     expect(
-      screen.getByRole("button", { name: /reportes · próximamente/i }),
-    ).toBeDisabled();
-    for (const [name, href] of [
+      within(nav)
+        .getAllByRole("link")
+        .map((link) => [link.textContent, link.getAttribute("href")]),
+    ).toEqual([
+      ["Inicio", "/"],
+      ["Empresas", "/empresas"],
       ["Inmuebles", "/inmuebles"],
-      ["Requerimientos", "/requerimientos"],
-      ["Aprendizaje", "/aprendizaje"],
-    ]) {
-      expect(screen.getByRole("link", { name })).toHaveAttribute("href", href);
-    }
+      ["Perfil", "/perfil"],
+    ]);
+    expect(within(nav).queryByRole("button")).not.toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent(/crear empresa/i);
     expect(
       screen.queryByText(/gráfica|métrica|ventas/i),
@@ -197,8 +195,8 @@ describe("shell autenticada", () => {
 
   it.each([
     ["/inmuebles", "Inmuebles"],
-    ["/requerimientos/abc", "Requerimientos"],
-    ["/aprendizaje", "Aprendizaje"],
+    ["/empresas/abc", "Empresas"],
+    ["/perfil", "Perfil"],
   ])("muestra el contexto del módulo en %s", (path, context) => {
     render(
       <MemoryRouter initialEntries={[path]}>
@@ -212,5 +210,17 @@ describe("shell autenticada", () => {
       "aria-current",
       "page",
     );
+  });
+
+  it("ubica los requerimientos dentro de Empresas", () => {
+    render(
+      <MemoryRouter initialEntries={["/requerimientos/abc"]}>
+        <Shell user={user} onLogout={vi.fn()}>
+          <p>Contenido</p>
+        </Shell>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("banner")).toHaveTextContent("Empresas");
+    expect(screen.getByRole("banner")).not.toHaveTextContent("Inicio");
   });
 });

@@ -7,7 +7,8 @@ import { ModelReport } from "./ModelReport";
 type Props = { user?: components["schemas"]["CurrentUserResponse"] };
 const evidenceKey = ["ml-evidence"];
 
-export function LearningPage({ user }: Props) {
+/** Evidence, training (admin only) and active model report, embeddable in other pages. */
+export function LearningPanel({ user }: Props) {
   const client = useQueryClient();
   const evidence = useQuery({
     queryKey: evidenceKey,
@@ -26,8 +27,7 @@ export function LearningPage({ user }: Props) {
         className="workspace-card feature-card module-card"
         aria-labelledby="learning-title"
       >
-        <p className="eyebrow">APRENDIZAJE</p>
-        <h1 id="learning-title">Aprendizaje</h1>
+        <h2 id="learning-title">Aprendizaje del ranking</h2>
         <p>
           Cada aceptación o rechazo de un candidato se guarda como evidencia.
           Con suficientes decisiones de ambas clases se entrena una regresión

@@ -4,10 +4,12 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 
 ## Módulos inmobiliarios (Fase 3)
 
-- `/inmuebles`: inventario paginado con filtros por texto, ciudad, tipo, estado y stock estratégico. Incluye la importación de locales desde la plantilla CSV (`Descargar plantilla CSV`): si una fila es inválida no se importa nada y se muestran los errores por fila.
-- `/requerimientos`: listado y alta de requerimientos por empresa.
+- `/` (Inicio): pendientes del asesor agrupados en vencidas, hoy y próximas (completar con un clic), KPIs, alta rápida de actividades, empresas que requieren atención y actividades completadas. El administrador ve el trabajo del equipo.
+- `/empresas`: cartera con filtro Activas (por defecto), Inactivas y Todas, búsqueda por nombre o RUC, asesor, requerimientos abiertos, actividades pendientes y vencidas, próxima y última actividad. `/empresas/nueva` crea una empresa.
+- `/empresas/:id`: espacio de la empresa con pestañas Resumen, Requerimientos (listado y alta), Actividades (agenda y seguimiento) y Contactos (`?tab=`).
 - `/requerimientos/:id`: ranking de candidatos por reglas (y probabilidad del modelo cuando existe), desglose por criterio, decisiones (preseleccionar, aceptar, rechazar con motivo), propuesta optimizada con Hill Climbing y ruta de visitas BFS vs A*.
-- `/aprendizaje`: evidencia de decisiones, métricas del modelo de regresión logística frente a la línea base de reglas, matriz de confusión, validación cruzada, coeficientes y entrenamiento (solo administradores).
+- `/inmuebles`: inventario (Disponible por defecto) con filtros e importación desde la plantilla CSV; si una fila es inválida no se importa nada y se muestran los errores por fila. `/inmuebles/:id` muestra el inmueble y las empresas cuyos requerimientos abiertos hacen match, ordenadas por el modelo o por reglas, con brechas y decisión previa.
+- `/perfil`: cuenta del usuario. El asesor ve su resumen y el modelo de ML; el administrador además ve el rendimiento de los asesores y las actividades del equipo, y puede entrenar el modelo (`?seccion=rendimiento|equipo|modelo`). Las rutas anteriores `/requerimientos`, `/contactos` y `/aprendizaje` redirigen a Empresas o Perfil.
 
 ## Inicio
 

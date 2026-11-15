@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { api } from "../../api/client";
 import {
   call,
@@ -37,8 +38,11 @@ function readFilters(form: FormData): Filters {
   };
 }
 
+/** Agents look for what they can offer, so the list opens on available stock. */
+const defaultFilters: Filters = { status: "available" };
+
 export function PropertiesPage() {
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [page, setPage] = useState(1);
   const properties = useQuery({
     queryKey: ["properties", filters, page],
@@ -102,7 +106,11 @@ export function PropertiesPage() {
             <label className="form-field" htmlFor="property-status">
               Estado
             </label>
-            <select id="property-status" name="status" defaultValue="">
+            <select
+              id="property-status"
+              name="status"
+              defaultValue={defaultFilters.status}
+            >
               <option value="">Todos</option>
               {Object.entries(propertyStatusLabels).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -169,7 +177,9 @@ export function PropertiesPage() {
                     <tr key={property.id}>
                       <td>{property.code}</td>
                       <td>
-                        <strong>{property.title}</strong>
+                        <Link to={`/inmuebles/${property.id}`}>
+                          <strong>{property.title}</strong>
+                        </Link>
                         <small>
                           {propertyTypeLabels[property.property_type]}
                         </small>

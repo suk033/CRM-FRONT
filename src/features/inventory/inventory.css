@@ -1,0 +1,35 @@
+.property-pills,
+.property-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.property-score {
+  align-items: center;
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+.property-facts {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+.property-facts dt {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.property-facts dd {
+  color: var(--color-heading);
+  margin: 0.125rem 0 0;
+}
+.property-subtitle {
+  color: var(--color-heading);
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+}

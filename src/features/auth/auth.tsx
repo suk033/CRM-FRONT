@@ -7,15 +7,16 @@ import {
   onAuthCleared,
   setAccessToken,
 } from "../../api/client";
-import { CompaniesHome, CompanyDetailPage } from "../companies/Companies";
+import { CompaniesOverviewPage } from "../companies/CompaniesOverviewPage";
+import { CompanyWorkspacePage } from "../companies/CompanyWorkspacePage";
 import { NewCompanyPage } from "../companies/NewCompanyPage";
 import { Shell } from "../../layout/Shell";
-import { ContactsHome } from "../contacts/ContactsHome";
-import { Dashboard } from "../home/Dashboard";
+import logo from "../../assets/supra-logo.svg";
+import { HomePage } from "../home/HomePage";
 import { PropertiesPage } from "../inventory/PropertiesPage";
-import { LearningPage } from "../learning/LearningPage";
+import { PropertyDetailPage } from "../inventory/PropertyDetailPage";
+import { ProfilePage } from "../profile/ProfilePage";
 import { RequirementDetailPage } from "../requirements/RequirementDetailPage";
-import { RequirementsPage } from "../requirements/RequirementsPage";
 
 type Credentials = { email: string; password: string };
 const userKey = ["current-user"];
@@ -50,20 +51,29 @@ export function AuthenticatedApp() {
   return (
     <Shell user={user.data} onLogout={logout}>
       <Routes>
-        <Route path="/" element={<Dashboard user={user.data} />} />
-        <Route path="/contactos" element={<ContactsHome />} />
-        <Route path="/empresas" element={<CompaniesHome />} />
+        <Route path="/" element={<HomePage user={user.data} />} />
+        <Route path="/empresas" element={<CompaniesOverviewPage />} />
         <Route path="/empresas/nueva" element={<NewCompanyPage />} />
-        <Route path="/empresas/:companyId" element={<CompanyDetailPage />} />
+        <Route path="/empresas/:companyId" element={<CompanyWorkspacePage />} />
         <Route path="/inmuebles" element={<PropertiesPage />} />
-        <Route path="/requerimientos" element={<RequirementsPage />} />
+        <Route path="/inmuebles/:propertyId" element={<PropertyDetailPage />} />
         <Route
           path="/requerimientos/:requirementId"
           element={<RequirementDetailPage />}
         />
+        <Route path="/perfil" element={<ProfilePage user={user.data} />} />
+        {/* Former top-level modules now live inside Empresas and Perfil. */}
+        <Route
+          path="/requerimientos"
+          element={<Navigate to="/empresas" replace />}
+        />
+        <Route
+          path="/contactos"
+          element={<Navigate to="/empresas" replace />}
+        />
         <Route
           path="/aprendizaje"
-          element={<LearningPage user={user.data} />}
+          element={<Navigate to="/perfil?seccion=modelo" replace />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -93,7 +103,7 @@ export function Login() {
       <section className="login-brand" aria-label="SUPRA CRM">
         <div className="login-wordmark">
           <span className="login-monogram" aria-hidden="true">
-            S
+            <img src={logo} alt="" />
           </span>
           <div>
             <strong>SUPRA CRM</strong>
