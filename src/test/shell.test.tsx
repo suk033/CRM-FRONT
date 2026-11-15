@@ -182,9 +182,35 @@ describe("shell autenticada", () => {
     expect(
       screen.getByRole("button", { name: /reportes · próximamente/i }),
     ).toBeDisabled();
+    for (const [name, href] of [
+      ["Inmuebles", "/inmuebles"],
+      ["Requerimientos", "/requerimientos"],
+      ["Aprendizaje", "/aprendizaje"],
+    ]) {
+      expect(screen.getByRole("link", { name })).toHaveAttribute("href", href);
+    }
     expect(screen.getByRole("main")).toHaveTextContent(/crear empresa/i);
     expect(
       screen.queryByText(/gráfica|métrica|ventas/i),
     ).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["/inmuebles", "Inmuebles"],
+    ["/requerimientos/abc", "Requerimientos"],
+    ["/aprendizaje", "Aprendizaje"],
+  ])("muestra el contexto del módulo en %s", (path, context) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <Shell user={user} onLogout={vi.fn()}>
+          <p>Contenido</p>
+        </Shell>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("banner")).toHaveTextContent(context);
+    expect(screen.getByRole("link", { name: context })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 });
