@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthenticatedApp, Login } from "./features/auth/auth";
 import "./styles.css";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>

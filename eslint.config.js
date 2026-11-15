@@ -10,5 +10,7 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks },
     rules: { ...reactHooks.configs.recommended.rules },
   },
-  { ignores: ["dist", "src/api/schema.ts"] },
+  {
+    ignores: ["dist", "src/api/schema.ts", ".agents/**"],
+  },
 );
