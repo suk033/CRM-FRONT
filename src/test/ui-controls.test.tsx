@@ -176,4 +176,22 @@ describe("login", () => {
     expect(screen.getByText("Ingresa tu contraseña.")).toBeInTheDocument();
     expect(logins).toBe(0);
   });
+
+  it("permite ver y ocultar la contraseña con el ojito", () => {
+    window.history.replaceState({}, "", "/login");
+    render(<App />);
+    const password = screen.getByLabelText("Contraseña");
+    expect(password).toHaveAttribute("type", "password");
+    expect(
+      screen.queryByText(/Puedes pegar tu contraseña/),
+    ).not.toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: "Mostrar contraseña" });
+    fireEvent.click(toggle);
+    expect(password).toHaveAttribute("type", "text");
+    expect(
+      screen.getByRole("button", { name: "Ocultar contraseña" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Ocultar contraseña" }));
+    expect(password).toHaveAttribute("type", "password");
+  });
 });

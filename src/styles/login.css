@@ -1,0 +1,152 @@
+/* Login: brand backdrop (same as the workspace), message panel and a white card. */
+.login-page {
+  background:
+    radial-gradient(
+      60rem 40rem at 100% 100%,
+      rgb(195 24 32 / 0.3),
+      transparent 60%
+    ),
+    radial-gradient(
+      45rem 35rem at 80% 0%,
+      rgb(34 184 207 / 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 40rem at 0% 0%,
+      rgb(25 54 105 / 0.9),
+      transparent 65%
+    ),
+    linear-gradient(160deg, #2a3150 0%, #323952 45%, #3b2f4a 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.login-page .login-brand {
+  background: transparent;
+  color: #fff;
+  gap: 2rem;
+}
+.login-page .login-wordmark strong {
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+.login-page .login-wordmark p,
+.login-page .login-brand-footer {
+  color: rgb(255 255 255 / 0.72);
+}
+.login-page .login-monogram {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgb(10 14 30 / 0.3);
+}
+.login-page .login-brand-title {
+  color: #fff;
+  font-size: clamp(2rem, 3.6vw, 3.25rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  max-width: 34rem;
+}
+.login-page .login-brand-message > p:not(.login-brand-title) {
+  color: rgb(255 255 255 / 0.82);
+  font-size: 1.0625rem;
+  max-width: 32rem;
+}
+.login-highlights {
+  display: grid;
+  gap: 0.875rem;
+  list-style: none;
+  margin: 1.75rem 0 0;
+  max-width: 32rem;
+  padding: 0;
+}
+.login-highlights li {
+  align-items: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 0.75rem;
+  color: #fff;
+  display: flex;
+  font-weight: 600;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+}
+.login-highlights .login-icon {
+  background: rgb(255 255 255 / 0.14);
+  border-radius: 0.5rem;
+  flex: 0 0 auto;
+  height: 2.25rem;
+  padding: 0.5rem;
+  width: 2.25rem;
+}
+.login-page .login-form-panel {
+  background: transparent;
+}
+.login-page .login-card {
+  background: rgb(255 255 255 / 0.97);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 60px rgb(10 14 30 / 0.35);
+}
+.login-page .login-card h1 {
+  color: #1f2533;
+}
+.login-page .login-description {
+  color: #5d6475;
+}
+.login-page .login-card input {
+  background: #fff;
+  border: 1px solid #d9dce5;
+  border-radius: 0.625rem;
+  color: #1f2533;
+  min-height: 2.875rem;
+}
+.login-password {
+  position: relative;
+}
+.login-password input {
+  padding-right: 3rem;
+  width: 100%;
+}
+.login-password-toggle {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #5d6475;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2.25rem;
+  justify-content: center;
+  position: absolute;
+  right: 0.375rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.25rem;
+}
+.login-password-toggle:hover:not(:disabled) {
+  background: #f1f2f6;
+  color: #1f2533;
+}
+.login-password-toggle:focus-visible {
+  outline: 0.1875rem solid #323952;
+  outline-offset: 0;
+}
+.login-password-toggle .login-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+.login-page .login-card .primary-action {
+  border-radius: 0.625rem;
+  margin-top: 1rem;
+  min-height: 2.875rem;
+}
+@media (max-width: 900px) {
+  .login-highlights {
+    display: none;
+  }
+  .login-page .login-brand-title {
+    font-size: 1.75rem;
+  }
+}
