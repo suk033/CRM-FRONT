@@ -117,3 +117,31 @@ export async function call<T>(
   }
   return result.data;
 }
+
+const propertyFeatureLabels: Record<string, string> = {
+  fachada_comercial: "Fachada comercial",
+  estacionamiento: "Estacionamiento",
+  vitrina: "Vitrina",
+  esquina: "Esquina",
+  alto_transito: "Alto tránsito",
+  bano: "Baño",
+  deposito: "Depósito",
+  aire_acondicionado: "Aire acondicionado",
+  ascensor: "Ascensor",
+  seguridad_24h: "Seguridad 24 h",
+  recepcion: "Recepción",
+  patio_maniobras: "Patio de maniobras",
+  anden_carga: "Andén de carga",
+  altura_libre_8m: "Altura libre 8 m",
+  oficinas: "Oficinas",
+  trifasico: "Energía trifásica",
+  zonificacion_industrial: "Zonificación industrial",
+  cerco_perimetrico: "Cerco perimétrico",
+  agua_desague: "Agua y desagüe",
+  acceso_pesado: "Acceso para carga pesada",
+};
+
+/** Human label for a property feature tag (falls back to the tag with spaces). */
+export function propertyFeatureLabel(tag: string) {
+  return propertyFeatureLabels[tag] ?? tag.replace(/_/g, " ");
+}

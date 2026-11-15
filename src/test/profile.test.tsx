@@ -147,6 +147,15 @@ const server = setupServer(
     }),
   ),
   http.get(`${api}/ml/evidence`, () => HttpResponse.json(evidence)),
+  http.get(`${api}/ml/models`, () => HttpResponse.json({ items: [] })),
+  http.get(`${api}/ml/behavior`, () =>
+    HttpResponse.json({
+      model_version: null,
+      open_candidates: null,
+      history: null,
+      rule_agreement_rate: null,
+    }),
+  ),
 );
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
@@ -228,8 +237,11 @@ describe("Perfil", () => {
     expect(
       await screen.findByRole("tab", { name: "Modelo ML" }),
     ).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByLabelText("Estado del modelo")).toHaveTextContent(
+      "Solo reglas",
+    );
     expect(
-      await screen.findByRole("heading", { name: "Sin modelo activo" }),
+      await screen.findByText("Todavía no hay versiones entrenadas."),
     ).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
@@ -239,7 +251,7 @@ describe("Perfil", () => {
     fireEvent.click(await screen.findByRole("tab", { name: "Modelo ML" }));
     expect(window.location.search).toBe("?seccion=modelo");
     expect(
-      await screen.findByRole("heading", { name: "Aprendizaje del ranking" }),
+      await screen.findByRole("heading", { name: "¿Qué hace el modelo?" }),
     ).toBeInTheDocument();
   });
 
