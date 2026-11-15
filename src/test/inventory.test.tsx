@@ -8,6 +8,7 @@ import {
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { chooseOption } from "./select";
 import { App, queryClient } from "../App";
 import { setAccessToken } from "../api/client";
 
@@ -88,7 +89,9 @@ describe("inmuebles", () => {
     expect(requests[0].get("page")).toBe("1");
     expect(requests[0].has("city")).toBe(false);
     expect(requests[0].get("status")).toBe("available");
-    expect(screen.getByLabelText("Estado")).toHaveValue("available");
+    expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent(
+      "Disponible",
+    );
     expect(
       screen.getByRole("link", { name: "Local esquina Miraflores" }),
     ).toHaveAttribute("href", "/inmuebles/p-1");
@@ -99,15 +102,9 @@ describe("inmuebles", () => {
     fireEvent.change(screen.getByLabelText("Ciudad"), {
       target: { value: "Lima" },
     });
-    fireEvent.change(screen.getByLabelText("Tipo"), {
-      target: { value: "retail" },
-    });
-    fireEvent.change(screen.getByLabelText("Estado"), {
-      target: { value: "reserved" },
-    });
-    fireEvent.change(screen.getByLabelText("Stock estratégico"), {
-      target: { value: "yes" },
-    });
+    chooseOption("Tipo", "Local comercial");
+    chooseOption("Estado", "Reservado");
+    chooseOption("Stock estratégico", "Solo estratégicos");
     fireEvent.click(screen.getByRole("button", { name: "Filtrar" }));
 
     await waitFor(() => expect(requests).toHaveLength(2));
@@ -125,9 +122,7 @@ describe("inmuebles", () => {
     window.history.replaceState({}, "", "/inmuebles");
     render(<App />);
     await screen.findByText("LOC-001");
-    fireEvent.change(screen.getByLabelText("Estado"), {
-      target: { value: "" },
-    });
+    chooseOption("Estado", "Todos");
     fireEvent.click(screen.getByRole("button", { name: "Filtrar" }));
     await waitFor(() => expect(requests).toHaveLength(2));
     expect(requests[1].has("status")).toBe(false);

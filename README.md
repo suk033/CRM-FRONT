@@ -9,7 +9,8 @@ La Fase 2 incorpora autenticación JWT almacenada únicamente en memoria: inicio
 - `/empresas/:id`: espacio de la empresa con pestañas Resumen, Requerimientos (listado y alta), Actividades (agenda y seguimiento) y Contactos (`?tab=`).
 - `/requerimientos/:id`: ranking de candidatos por reglas (y probabilidad del modelo cuando existe), desglose por criterio, decisiones (preseleccionar, aceptar, rechazar con motivo), propuesta optimizada con Hill Climbing y ruta de visitas BFS vs A*.
 - `/inmuebles`: inventario (Disponible por defecto) con filtros e importación desde la plantilla CSV; si una fila es inválida no se importa nada y se muestran los errores por fila. `/inmuebles/:id` muestra el inmueble y las empresas cuyos requerimientos abiertos hacen match, ordenadas por el modelo o por reglas, con brechas y decisión previa.
-- `/perfil`: cuenta del usuario. El asesor ve su resumen y el modelo de ML; el administrador además ve el rendimiento de los asesores y las actividades del equipo, y puede entrenar el modelo (`?seccion=rendimiento|equipo|modelo`). Las rutas anteriores `/requerimientos`, `/contactos` y `/aprendizaje` redirigen a Empresas o Perfil.
+- `/perfil`: cuenta del usuario. El asesor ve su resumen; el administrador además ve el rendimiento de los asesores y las actividades del equipo, y puede entrenar el modelo (`?seccion=rendimiento|equipo|modelo`). Las rutas anteriores `/requerimientos`, `/contactos` y `/aprendizaje` redirigen a Empresas o Perfil.
+- Interfaz: desplegables, selector de archivo, confirmaciones y avisos propios (sin los controles ni mensajes nativos del navegador), validación en la página y modo claro/noche (botón en la barra superior; la elección se recuerda en el navegador).
 
 ## Inicio
 

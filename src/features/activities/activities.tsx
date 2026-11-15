@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -6,6 +6,8 @@ import { api } from "../../api/client";
 import type { components } from "../../api/schema";
 import { call } from "../inventory/labels";
 import { EmptyState, Pill } from "../../components/ui";
+import { ConfirmDialog, useToast } from "../../components/Feedback";
+import { Select } from "../../components/Select";
 
 export type Activity = components["schemas"]["ActivityResponse"];
 export type ActivityKind = Activity["kind"];
@@ -111,7 +113,7 @@ function KindIcon({ kind }: { kind: ActivityKind }) {
   );
 }
 
-/** ClickUp-style task rows: checkbox to complete, kind icon, company link, due date and status. */
+/** ClickUp-style task rows: checkbox (with confirmation) to complete, kind icon, company link, due date and status. */
 export function ActivityList({
   items,
   showCompany = true,
@@ -122,14 +124,35 @@ export function ActivityList({
   empty?: string;
 }) {
   const update = useUpdateActivity();
+  const { notify } = useToast();
+  const [pending, setPending] = useState<Activity | null>(null);
   if (items.length === 0) return <EmptyState>{empty}</EmptyState>;
+  const reopening = pending?.status === "done";
+
+  function confirm() {
+    if (!pending) return;
+    const target = pending;
+    update.mutate(
+      { id: target.id, body: { status: reopening ? "pending" : "done" } },
+      {
+        onSuccess: () => {
+          setPending(null);
+          notify(
+            reopening
+              ? `"${target.title}" volvió a pendientes.`
+              : `"${target.title}" se registró como completada.`,
+          );
+        },
+        onError: (error) => {
+          setPending(null);
+          notify(error.message, "danger");
+        },
+      },
+    );
+  }
+
   return (
     <>
-      {update.isError && (
-        <p className="form-error" role="alert">
-          {update.error.message}
-        </p>
-      )}
       <ul className="ws-task-list">
         {items.map((activity) => {
           const done = activity.status === "done";
@@ -144,12 +167,7 @@ export function ActivityList({
                 checked={done}
                 disabled={update.isPending || activity.status === "cancelled"}
                 aria-label={`${done ? "Reabrir" : "Completar"}: ${activity.title}`}
-                onChange={() =>
-                  update.mutate({
-                    id: activity.id,
-                    body: { status: done ? "pending" : "done" },
-                  })
-                }
+                onChange={() => setPending(activity)}
               />
               <KindIcon kind={activity.kind} />
               <div className="ws-task-body">
@@ -184,17 +202,46 @@ export function ActivityList({
           );
         })}
       </ul>
+      <ConfirmDialog
+        open={pending !== null}
+        title={
+          reopening ? "¿Reabrir la actividad?" : "¿Marcar como completada?"
+        }
+        description={
+          pending && (
+            <>
+              <strong>{pending.title}</strong> · {pending.company_name}
+              <br />
+              {reopening
+                ? "Volverá a la lista de pendientes."
+                : "Se registrará la fecha y hora de cierre."}
+            </>
+          )
+        }
+        confirmLabel={reopening ? "Reabrir" : "Sí, completar"}
+        busy={update.isPending}
+        onConfirm={confirm}
+        onCancel={() => setPending(null)}
+      />
     </>
   );
 }
 
 type CompanyOption = { id: string; name: string };
 type RequirementOption = { id: string; code: string; title: string };
+type FieldErrors = Partial<Record<"company_id" | "title" | "due_at", string>>;
 
 function localInputValue(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
+
+const kindOptions = Object.entries(activityKindLabels).map(
+  ([value, label]) => ({
+    value,
+    label,
+  }),
+);
 
 /** Quick-create form. Pass `companyId` to fix the company (company workspace), or `companies` to choose one. */
 export function ActivityForm({
@@ -209,96 +256,132 @@ export function ActivityForm({
   onCreated?: () => void;
 }) {
   const create = useCreateActivity();
+  const { notify } = useToast();
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [formKey, setFormKey] = useState(0);
   const [defaultDue] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() + 1);
     date.setHours(10, 0, 0, 0);
     return localInputValue(date);
   });
+  const ids = {
+    company: useId(),
+    kind: useId(),
+    requirement: useId(),
+    errors: useId(),
+  };
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const due = new Date(String(data.get("due_at")));
+    const data = new FormData(event.currentTarget);
+    const company = companyId ?? String(data.get("company_id") ?? "");
+    const title = String(data.get("title") ?? "").trim();
+    const dueText = String(data.get("due_at") ?? "");
+    const due = new Date(dueText);
+    const found: FieldErrors = {};
+    if (!company) found.company_id = "Selecciona una empresa.";
+    if (!title) found.title = "Escribe un título para la actividad.";
+    if (!dueText || Number.isNaN(due.getTime()))
+      found.due_at = "Indica la fecha y hora.";
+    setErrors(found);
+    if (Object.keys(found).length) return;
     const requirement = String(data.get("requirement_id") ?? "");
     create.mutate(
       {
-        company_id: companyId ?? String(data.get("company_id")),
+        company_id: company,
         requirement_id: requirement || null,
         kind: String(data.get("kind")) as ActivityKind,
-        title: String(data.get("title")).trim(),
+        title,
         notes: String(data.get("notes") ?? "").trim() || null,
         due_at: due.toISOString(),
       },
       {
-        onSuccess: () => {
-          form.reset();
+        onSuccess: (activity) => {
+          setFormKey((key) => key + 1);
+          notify(`Actividad agendada para ${formatDue(activity.due_at)}.`);
           onCreated?.();
         },
       },
     );
   }
+
   return (
     <form
+      key={formKey}
       className="ws-activity-form"
       onSubmit={submit}
       aria-label="Nueva actividad"
+      noValidate
     >
       {!companyId && (
-        <label>
-          Empresa
-          <select name="company_id" required defaultValue="">
-            <option value="" disabled>
-              Selecciona una empresa
-            </option>
-            {companies.map((company) => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="ws-field">
+          <label htmlFor={ids.company}>Empresa</label>
+          <Select
+            id={ids.company}
+            name="company_id"
+            placeholder="Selecciona una empresa"
+            options={companies.map((company) => ({
+              value: company.id,
+              label: company.name,
+            }))}
+            invalid={Boolean(errors.company_id)}
+            onChange={() =>
+              setErrors((current) => ({ ...current, company_id: undefined }))
+            }
+          />
+          {errors.company_id && (
+            <span className="ws-field-error">{errors.company_id}</span>
+          )}
+        </div>
       )}
-      <label>
-        Tipo
-        <select name="kind" defaultValue="meeting">
-          {Object.entries(activityKindLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="ws-field">
+        <label htmlFor={ids.kind}>Tipo</label>
+        <Select
+          id={ids.kind}
+          name="kind"
+          defaultValue="meeting"
+          options={kindOptions}
+        />
+      </div>
       <label className="ws-span-2">
         Título
         <input
           name="title"
-          required
           maxLength={200}
           placeholder="Ej. Reunión de presentación de locales"
+          aria-invalid={Boolean(errors.title) || undefined}
         />
+        {errors.title && <span className="ws-field-error">{errors.title}</span>}
       </label>
       <label>
         Fecha y hora
         <input
           name="due_at"
           type="datetime-local"
-          required
           defaultValue={defaultDue}
+          aria-invalid={Boolean(errors.due_at) || undefined}
         />
+        {errors.due_at && (
+          <span className="ws-field-error">{errors.due_at}</span>
+        )}
       </label>
       {requirements.length > 0 && (
-        <label>
-          Requerimiento
-          <select name="requirement_id" defaultValue="">
-            <option value="">Sin requerimiento</option>
-            {requirements.map((requirement) => (
-              <option key={requirement.id} value={requirement.id}>
-                {requirement.code} · {requirement.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="ws-field">
+          <label htmlFor={ids.requirement}>Requerimiento</label>
+          <Select
+            id={ids.requirement}
+            name="requirement_id"
+            defaultValue=""
+            options={[
+              { value: "", label: "Sin requerimiento" },
+              ...requirements.map((requirement) => ({
+                value: requirement.id,
+                label: `${requirement.code} · ${requirement.title}`,
+              })),
+            ]}
+          />
+        </div>
       )}
       <label className="ws-span-2">
         Notas
@@ -312,6 +395,11 @@ export function ActivityForm({
         >
           {create.isPending ? "Guardando…" : "Agendar actividad"}
         </button>
+        {Object.keys(errors).length > 0 && (
+          <p className="form-error" role="alert" id={ids.errors}>
+            Revisa los campos marcados.
+          </p>
+        )}
         {create.isError && (
           <p className="form-error" role="alert">
             {create.error.message}

@@ -9,6 +9,7 @@ import {
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { chooseOption, optionLabels } from "./select";
 import { App, queryClient } from "../App";
 import { setAccessToken } from "../api/client";
 
@@ -230,22 +231,18 @@ describe("espacio de empresa", () => {
     const panel = await screen.findByRole("tabpanel", { name: "Actividades" });
     await within(panel).findByText("Llamada inicial");
     expect(
-      within(panel).queryByLabelText("Empresa", { selector: "select" }),
+      within(panel).queryByRole("combobox", { name: "Empresa" }),
     ).not.toBeInTheDocument();
-    await within(panel).findByRole("option", { name: "REQ-1 · Local 1" });
-    expect(
-      within(panel).queryByRole("option", { name: "REQ-2 · Local 2" }),
-    ).not.toBeInTheDocument();
+    await within(panel).findByRole("combobox", { name: "Requerimiento" });
+    const requirementOptions = optionLabels("Requerimiento", panel);
+    expect(requirementOptions).toContain("REQ-1 · Local 1");
+    expect(requirementOptions).not.toContain("REQ-2 · Local 2");
 
-    fireEvent.change(within(panel).getByLabelText("Tipo"), {
-      target: { value: "call" },
-    });
+    chooseOption("Tipo", "Llamada", panel);
     fireEvent.change(within(panel).getByLabelText("Título"), {
       target: { value: "  Llamada de seguimiento " },
     });
-    fireEvent.change(within(panel).getByLabelText("Requerimiento"), {
-      target: { value: "1" },
-    });
+    chooseOption("Requerimiento", "REQ-1 · Local 1", panel);
     const overviewBefore = overviewGets;
     fireEvent.click(
       within(panel).getByRole("button", { name: "Agendar actividad" }),

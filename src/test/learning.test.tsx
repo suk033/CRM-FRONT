@@ -140,12 +140,17 @@ describe("aprendizaje", () => {
     );
   });
 
-  it("oculta el entrenamiento a los asesores", async () => {
+  it("el modelo y su entrenamiento son solo del administrador", async () => {
     currentUser = { ...admin, role: "advisor" };
     renderLearning();
-    await screen.findByRole("heading", {
-      name: "Regresión logística · versión 3",
-    });
+    expect(
+      await screen.findByLabelText("Indicadores personales"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", {
+        name: "Regresión logística · versión 3",
+      }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Entrenar nuevo modelo" }),
     ).not.toBeInTheDocument();

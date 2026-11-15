@@ -13,6 +13,8 @@ import {
   type PropertyType,
 } from "./labels";
 import { PropertyImport } from "./PropertyImport";
+import { PageHeader, Panel } from "../../components/ui";
+import { Select } from "../../components/Select";
 
 const pageSize = 10;
 
@@ -65,84 +67,89 @@ export function PropertiesPage() {
   }
 
   return (
-    <div className="module-page">
-      <section
-        className="workspace-card feature-card module-card"
-        aria-labelledby="properties-title"
-      >
-        <p className="eyebrow">INVENTARIO</p>
-        <h1 id="properties-title">Inmuebles</h1>
-        <p>
-          Locales comerciales, oficinas, almacenes y terrenos disponibles para
-          los requerimientos de tus empresas.
-        </p>
-        <form className="filter-form" onSubmit={submit} role="search">
-          <div className="field-group">
-            <label className="form-field" htmlFor="property-q">
-              Buscar
-            </label>
+    <div className="ws-page">
+      <PageHeader
+        eyebrow="Inventario"
+        title="Inmuebles"
+        description="Locales comerciales, oficinas, almacenes y terrenos disponibles para los requerimientos de tus empresas."
+      />
+      <Panel title="Filtros">
+        <form className="ws-filter-bar" onSubmit={submit} role="search">
+          <label>
+            Buscar
             <input id="property-q" name="q" placeholder="Código o título" />
+          </label>
+          <label>
+            Ciudad
+            <input id="property-city" name="city" placeholder="Ej. Lima" />
+          </label>
+          <div className="ws-field">
+            <label htmlFor="property-type">Tipo</label>
+            <Select
+              id="property-type"
+              name="property_type"
+              defaultValue=""
+              options={[
+                { value: "", label: "Todos" },
+                ...Object.entries(propertyTypeLabels).map(([value, label]) => ({
+                  value,
+                  label,
+                })),
+              ]}
+            />
           </div>
-          <div className="field-group">
-            <label className="form-field" htmlFor="property-city">
-              Ciudad
-            </label>
-            <input id="property-city" name="city" />
-          </div>
-          <div className="field-group">
-            <label className="form-field" htmlFor="property-type">
-              Tipo
-            </label>
-            <select id="property-type" name="property_type" defaultValue="">
-              <option value="">Todos</option>
-              {Object.entries(propertyTypeLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="field-group">
-            <label className="form-field" htmlFor="property-status">
-              Estado
-            </label>
-            <select
+          <div className="ws-field">
+            <label htmlFor="property-status">Estado</label>
+            <Select
               id="property-status"
               name="status"
               defaultValue={defaultFilters.status}
-            >
-              <option value="">Todos</option>
-              {Object.entries(propertyStatusLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "Todos" },
+                ...Object.entries(propertyStatusLabels).map(
+                  ([value, label]) => ({
+                    value,
+                    label,
+                  }),
+                ),
+              ]}
+            />
           </div>
-          <div className="field-group">
-            <label className="form-field" htmlFor="property-stock">
-              Stock estratégico
-            </label>
-            <select id="property-stock" name="strategic_stock" defaultValue="">
-              <option value="">Todos</option>
-              <option value="yes">Solo estratégicos</option>
-              <option value="no">No estratégicos</option>
-            </select>
+          <div className="ws-field">
+            <label htmlFor="property-stock">Stock estratégico</label>
+            <Select
+              id="property-stock"
+              name="strategic_stock"
+              defaultValue=""
+              options={[
+                { value: "", label: "Todos" },
+                { value: "yes", label: "Solo estratégicos" },
+                { value: "no", label: "No estratégicos" },
+              ]}
+            />
           </div>
           <button className="primary-action" type="submit">
             Filtrar
           </button>
         </form>
-      </section>
+      </Panel>
 
       <PropertyImport />
 
       <section
-        className="workspace-card feature-card module-card"
+        className="ws-panel"
         aria-labelledby="properties-results"
         aria-busy={properties.isFetching}
       >
-        <h2 id="properties-results">Resultados</h2>
+        <div className="ws-panel-header">
+          <h2 id="properties-results">Resultados</h2>
+          {properties.data && properties.data.items.length > 0 && (
+            <span className="ws-muted">
+              {total} inmueble{total === 1 ? "" : "s"} · página {page} de{" "}
+              {pages}
+            </span>
+          )}
+        </div>
         {properties.isLoading && <p role="status">Cargando inmuebles…</p>}
         {properties.isError && (
           <p className="form-error" role="alert">
@@ -150,18 +157,14 @@ export function PropertiesPage() {
           </p>
         )}
         {properties.data && properties.data.items.length === 0 && (
-          <p className="empty-state">
+          <p className="ws-empty">
             No hay inmuebles que coincidan con los filtros.
           </p>
         )}
         {properties.data && properties.data.items.length > 0 && (
           <>
-            <p>
-              {total} inmueble{total === 1 ? "" : "s"} · página {page} de{" "}
-              {pages}
-            </p>
-            <div className="table-scroll">
-              <table className="data-table">
+            <div className="ws-table-wrap">
+              <table className="ws-table">
                 <thead>
                   <tr>
                     <th scope="col">Código</th>
@@ -175,14 +178,14 @@ export function PropertiesPage() {
                 <tbody>
                   {properties.data.items.map((property) => (
                     <tr key={property.id}>
-                      <td>{property.code}</td>
+                      <td className="ws-code">{property.code}</td>
                       <td>
                         <Link to={`/inmuebles/${property.id}`}>
-                          <strong>{property.title}</strong>
+                          {property.title}
                         </Link>
-                        <small>
+                        <span className="ws-muted">
                           {propertyTypeLabels[property.property_type]}
-                        </small>
+                        </span>
                       </td>
                       <td>
                         {property.district}, {property.city}
@@ -192,21 +195,23 @@ export function PropertiesPage() {
                         {formatMoney(property.monthly_rent, property.currency)}
                       </td>
                       <td>
-                        <span className={`badge badge-${property.status}`}>
-                          {propertyStatusLabels[property.status]}
-                        </span>
-                        {property.is_strategic_stock && (
-                          <span className="badge badge-strategic">
-                            Stock estratégico
+                        <span className="ws-badges">
+                          <span className={`badge badge-${property.status}`}>
+                            {propertyStatusLabels[property.status]}
                           </span>
-                        )}
+                          {property.is_strategic_stock && (
+                            <span className="badge badge-strategic">
+                              Stock estratégico
+                            </span>
+                          )}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="button-row">
+            <div className="ws-pagination">
               <button
                 className="secondary-action"
                 disabled={page <= 1 || properties.isFetching}

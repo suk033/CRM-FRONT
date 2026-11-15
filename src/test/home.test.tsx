@@ -18,6 +18,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { optionLabels } from "./select";
 import { App, queryClient } from "../App";
 import { setAccessToken } from "../api/client";
 
@@ -228,9 +229,32 @@ describe("Inicio", () => {
         name: "Completar: Reunión de presentación",
       }),
     );
+    const dialog = screen.getByRole("alertdialog", {
+      name: "¿Marcar como completada?",
+    });
+    expect(patches).toEqual([]);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancelar" }));
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(patches).toEqual([]);
+
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Completar: Reunión de presentación",
+      }),
+    );
+    fireEvent.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "Sí, completar",
+      }),
+    );
     await waitFor(() =>
       expect(patches).toEqual([{ id: "a2", body: { status: "done" } }]),
     );
+    expect(
+      await screen.findByText(
+        '"Reunión de presentación" se registró como completada.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it("lista empresas que requieren atención, completadas y el formulario por empresa", async () => {
@@ -255,15 +279,11 @@ describe("Inicio", () => {
       await within(completed).findByText("Correo de bienvenida"),
     ).toBeInTheDocument();
 
-    const select = within(
-      screen.getByRole("form", { name: "Nueva actividad" }),
-    ).getByLabelText("Empresa");
+    const form = screen.getByRole("form", { name: "Nueva actividad" });
     expect(
-      within(select)
-        .getAllByRole("option")
-        .map((option) => option.textContent),
-    ).toEqual([
-      "Selecciona una empresa",
+      within(form).getByRole("combobox", { name: "Empresa" }),
+    ).toHaveTextContent("Selecciona una empresa");
+    expect(optionLabels("Empresa", form)).toEqual([
       "Café Andino",
       "Textiles del Sur S.A.",
       "Ferretería Lima",

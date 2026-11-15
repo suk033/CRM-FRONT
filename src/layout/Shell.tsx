@@ -9,6 +9,8 @@ import { NavLink, useLocation } from "react-router-dom";
 import type { components } from "../api/schema";
 import { Avatar } from "../components/ui";
 import logo from "../assets/supra-logo.svg";
+import { ToastProvider } from "../components/Feedback";
+import { ThemeToggle } from "../components/Theme";
 
 type Props = {
   user?: components["schemas"]["CurrentUserResponse"];
@@ -110,6 +112,7 @@ export function Shell({ user, onLogout, children }: Props) {
               </span>
             )}
           </div>
+          <ThemeToggle />
           <button className="secondary-action" onClick={onLogout}>
             Cerrar sesión
           </button>
@@ -150,7 +153,9 @@ export function Shell({ user, onLogout, children }: Props) {
           </div>
         )}
       </nav>
-      <main className="shell-main">{children}</main>
+      <main className="shell-main">
+        <ToastProvider>{children}</ToastProvider>
+      </main>
     </div>
   );
 }

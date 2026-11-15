@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthenticatedApp, Login } from "./features/auth/auth";
 import "./styles.css";
 import "./styles/workspace.css";
+import "./styles/workspace-controls.css";
 
 export const queryClient = new QueryClient();
 export function App() {

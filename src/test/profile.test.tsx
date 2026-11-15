@@ -9,6 +9,7 @@ import {
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { chooseOption } from "./select";
 import { App, queryClient } from "../App";
 import { setAccessToken } from "../api/client";
 
@@ -197,16 +198,16 @@ describe("Perfil", () => {
   it("el asesor no ve el rendimiento del equipo y sí su resumen", async () => {
     currentUser = advisorUser;
     renderProfile("/perfil?seccion=rendimiento");
+    const summary = await screen.findByLabelText("Indicadores personales");
+    // Advisors have a single section: no tabs, no team performance, no ML model.
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
     expect(
-      await screen.findByRole("tab", { name: "Mi resumen" }),
-    ).toHaveAttribute("aria-selected", "true");
-    expect(
-      screen.queryByRole("tab", { name: "Rendimiento de asesores" }),
+      screen.queryByText("Rendimiento de asesores"),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("tab", { name: "Actividades del equipo" }),
+      screen.queryByText("Actividades del equipo"),
     ).not.toBeInTheDocument();
-    const summary = screen.getByLabelText("Indicadores personales");
+    expect(screen.queryByText("Modelo ML")).not.toBeInTheDocument();
     await waitFor(() =>
       expect(
         within(summary).getByText("Empresas").nextSibling,
@@ -254,15 +255,11 @@ describe("Perfil", () => {
     ).toHaveTextContent("Visitar local Surco");
     expect(activityQueries.at(-1)?.get("status")).toBe("pending");
 
-    fireEvent.change(screen.getByLabelText("Asesor"), {
-      target: { value: "maria@supra.test" },
-    });
+    chooseOption("Asesor", "maria@supra.test");
     expect(screen.queryByText("Llamar a Café Andino")).not.toBeInTheDocument();
     expect(screen.getByText("Visitar local Surco")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Estado"), {
-      target: { value: "cancelled" },
-    });
+    chooseOption("Estado", "Canceladas");
     expect(
       await screen.findByText("No hay actividades con estos filtros."),
     ).toBeInTheDocument();
