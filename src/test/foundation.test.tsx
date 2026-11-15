@@ -14,7 +14,7 @@ describe("frontend foundation", () => {
       "type",
       "email",
     );
-    expect(screen.getByLabelText(/contraseña/i)).toHaveAttribute(
+    expect(screen.getByLabelText("Contraseña")).toHaveAttribute(
       "type",
       "password",
     );

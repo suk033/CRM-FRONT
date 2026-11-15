@@ -4,6 +4,7 @@ import { AuthenticatedApp, Login } from "./features/auth/auth";
 import "./styles.css";
 import "./styles/workspace.css";
 import "./styles/workspace-controls.css";
+import "./styles/login.css";
 
 export const queryClient = new QueryClient();
 export function App() {

@@ -57,7 +57,7 @@ async function login() {
   fireEvent.change(screen.getByLabelText(/correo/i), {
     target: { value: "ana@supra.test" },
   });
-  fireEvent.change(screen.getByLabelText(/contraseña/i), {
+  fireEvent.change(screen.getByLabelText("Contraseña"), {
     target: { value: "clave-secreta" },
   });
   fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
@@ -72,14 +72,16 @@ describe("autenticación", () => {
       "Iniciar sesión",
     );
     expect(
-      screen.getByText("Empresas y contactos, en un solo lugar."),
+      screen.getByText(
+        "Cada búsqueda inmobiliaria, un activo para la siguiente.",
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText(/acceso por roles/i)).toBeInTheDocument();
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     const email = screen.getByLabelText(/correo/i);
-    const password = screen.getByLabelText(/contraseña/i);
+    const password = screen.getByLabelText("Contraseña");
     expect(email).toHaveValue("");
     expect(email).toHaveAttribute("name", "email");
     expect(email).toHaveAttribute("autocomplete", "email");
@@ -104,7 +106,7 @@ describe("autenticación", () => {
     );
     render(<App />);
     const email = screen.getByLabelText(/correo/i);
-    const password = screen.getByLabelText(/contraseña/i);
+    const password = screen.getByLabelText("Contraseña");
     const form = screen.getByRole("form", { name: /iniciar sesión/i });
     fireEvent.change(email, { target: { value: "ana@supra.test" } });
     fireEvent.change(password, { target: { value: "clave-secreta" } });
@@ -155,7 +157,7 @@ describe("autenticación", () => {
     fireEvent.change(screen.getByLabelText(/correo/i), {
       target: { value: "ana@supra.test" },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText("Contraseña"), {
       target: { value: "clave-secreta" },
     });
     fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
@@ -176,7 +178,7 @@ describe("autenticación", () => {
       await screen.findByRole("heading", { name: /iniciar sesión/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/accede a tu espacio de trabajo/i),
+      screen.getByText(/ingresa con tu correo corporativo/i),
     ).toBeInTheDocument();
     expect(document.documentElement.innerHTML).not.toContain("token-secreto");
     // Only the light/dark preference may be stored; never the access token.
@@ -198,7 +200,7 @@ describe("autenticación", () => {
     fireEvent.change(screen.getByLabelText(/correo/i), {
       target: { value: "ana@supra.test" },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText("Contraseña"), {
       target: { value: "clave-secreta" },
     });
     fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));

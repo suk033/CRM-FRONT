@@ -301,7 +301,7 @@ describe("empresas", () => {
           fireEvent.change(screen.getByLabelText(/correo/i), {
             target: { value: user.email },
           });
-          fireEvent.change(screen.getByLabelText(/contraseña/i), {
+          fireEvent.change(screen.getByLabelText("Contraseña"), {
             target: { value: "clave" },
           });
           fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));

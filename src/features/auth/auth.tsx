@@ -85,6 +85,7 @@ export function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const login = useMutation({
     mutationFn: async (credentials: Credentials) => {
       const { data, response } = await api.POST("/api/v1/auth/login", {
@@ -108,20 +109,34 @@ export function Login() {
           </span>
           <div>
             <strong>SUPRA CRM</strong>
-            <p>Gestión de relaciones empresariales</p>
+            <p>Gestión inmobiliaria corporativa</p>
           </div>
         </div>
         <div className="login-brand-message">
           <p className="login-brand-title">
-            Empresas y contactos, en un solo lugar.
+            Cada búsqueda inmobiliaria, un activo para la siguiente.
           </p>
           <p>
-            Crea empresas, consulta sus fichas y organiza sus contactos desde tu
-            espacio de trabajo.
+            Requerimientos corporativos, locales candidatos y el seguimiento de
+            tu equipo en un solo lugar.
           </p>
+          <ul className="login-highlights">
+            <li>
+              <LoginIcon path="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />
+              Locales ordenados por qué tan bien encajan con cada cliente
+            </li>
+            <li>
+              <LoginIcon path="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+              Agenda y pendientes de cada asesor
+            </li>
+            <li>
+              <LoginIcon path="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6" />
+              Rendimiento del equipo y recomendaciones explicables
+            </li>
+          </ul>
         </div>
         <p className="login-brand-footer">
-          Espacio empresarial · Acceso por roles
+          Gestión inmobiliaria corporativa · Acceso por roles
         </p>
       </section>
       <div className="login-form-panel">
@@ -149,8 +164,7 @@ export function Login() {
           <p className="eyebrow">ACCESO A TU ESPACIO</p>
           <h1 id="login-title">Iniciar sesión</h1>
           <p className="login-description">
-            Accede a tu espacio de trabajo para gestionar la relación con tus
-            empresas y contactos.
+            Ingresa con tu correo corporativo para continuar.
           </p>
           <label className="form-field" htmlFor="login-email">
             Correo electrónico
@@ -170,22 +184,39 @@ export function Login() {
           <label className="form-field" htmlFor="login-password">
             Contraseña
           </label>
-          <input
-            id="login-password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            disabled={login.isPending}
-            aria-describedby="login-password-help"
-            aria-invalid={Boolean(fieldErrors.password) || undefined}
-          />
+          <div className="login-password">
+            <input
+              id="login-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              required
+              disabled={login.isPending}
+              aria-invalid={Boolean(fieldErrors.password) || undefined}
+            />
+            <button
+              type="button"
+              className="login-password-toggle"
+              aria-label={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              aria-pressed={showPassword}
+              aria-controls="login-password"
+              disabled={login.isPending}
+              onClick={() => setShowPassword((visible) => !visible)}
+            >
+              <LoginIcon
+                path={
+                  showPassword
+                    ? "M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10.4 10.4 0 0 1 12 5c6 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s4 7 10 7a9.7 9.7 0 0 0 5.4-1.6"
+                    : "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                }
+              />
+            </button>
+          </div>
           {fieldErrors.password && (
             <span className="ws-field-error">{fieldErrors.password}</span>
           )}
-          <p id="login-password-help" className="login-help">
-            Puedes pegar tu contraseña o usar tu gestor.
-          </p>
           {error && (
             <p className="form-error" role="alert">
               No fue posible iniciar sesión. Verifica tus datos e inténtalo de
@@ -210,5 +241,22 @@ export function Login() {
         </p>
       </div>
     </main>
+  );
+}
+
+function LoginIcon({ path }: { path: string }) {
+  return (
+    <svg
+      className="login-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={path} />
+    </svg>
   );
 }
