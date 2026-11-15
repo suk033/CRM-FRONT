@@ -26,8 +26,11 @@ import {
 } from "../home/workspaceData";
 import "./profile.css";
 import { Select } from "../../components/Select";
+import { AdminUsers } from "./AdminUsers";
+import { AdminAssignments } from "./AdminAssignments";
 
-type Section = "resumen" | "rendimiento" | "equipo" | "modelo";
+type Section =
+  "resumen" | "rendimiento" | "equipo" | "usuarios" | "asignacion" | "modelo";
 
 const memberSince = new Intl.DateTimeFormat("es-PE", {
   day: "numeric",
@@ -50,6 +53,8 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
     ? [
         { id: "rendimiento", label: "Rendimiento de asesores" },
         { id: "equipo", label: "Actividades del equipo" },
+        { id: "usuarios", label: "Usuarios" },
+        { id: "asignacion", label: "Asignación de empresas" },
         { id: "modelo", label: "Modelo ML" },
       ]
     : [{ id: "resumen", label: "Mi resumen" }];
@@ -72,7 +77,7 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         title="Perfil"
         description={
           isAdmin
-            ? "Tu cuenta, el rendimiento del equipo y el modelo de recomendación."
+            ? "Tu cuenta, el equipo, los accesos, la asignación de empresas y el modelo de recomendación."
             : "Tu cuenta y tu avance con tus empresas."
         }
       />
@@ -119,6 +124,8 @@ export function ProfilePage({ user }: { user?: CurrentUser }) {
         {active === "resumen" && <MySummary />}
         {active === "rendimiento" && <AdvisorPerformance />}
         {active === "equipo" && <TeamActivities />}
+        {active === "usuarios" && <AdminUsers currentUserId={user.id} />}
+        {active === "asignacion" && <AdminAssignments />}
         {active === "modelo" && <LearningPanel user={user} />}
       </div>
     </div>
